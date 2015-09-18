@@ -1,8 +1,8 @@
-# About groupJS
+## About groupJS
 
 GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group.
 
-# Why do I need groupJS
+## Why do I need groupJS
 
 As you may already know that javascript takes prototypal inheritance, it creates flexible programming style. However, I am not a big fans of coding with .prototype. all the time (say composition). This method drains up my brain. Thus, I started looking for an implementation pattern fitting myself. 
 
@@ -10,9 +10,9 @@ At first I jumped in the area of Backbone.js and its best friend marionette. The
 
 # Documentation
 
-## Source Code Explaination
+### Source Code Explaination
 
-'''javascript
+```javascript
 var obj = {
     create: function(name){
         var newObj = Object.create(this);
@@ -75,30 +75,35 @@ group.extend({
         return memberCmd(methodName, opt);
     },
 });
-'''
+```
 
-## Usages
-### Object Inheritance
+### Usages
+##### Object Inheritance
 
-1. obj.create(<object name>) - Create a new object
+1. `obj.create(<object name>)` - Create a new object
 
 e.g.
+```javascript
 var newObj = obj.create('newObj');
 var newObj_1 = newObj.create('newObj_1');
+```
 
-2. obj.extend( obj1 [, obj2, ......] ) - extend object's attributes. If attribute exists, it will be overriden.
+2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.
 
 e.g.
+```javascript
 var newObj = obj.create('newObj');
 newObj.extend({
     newAttribute: function() {
         alert('this is a new attribute');
     },
 });
+```
 
-3. obj.command() - return a function which provides simple and restricted interface.
+3. `obj.command()` - return a function which provides simple and restricted interface.
 
 e.g.
+```javascript
 var newObj = obj.create('newObj');
 newObj.extend({
     newAttribute: function(opt) {
@@ -108,19 +113,22 @@ newObj.extend({
 
 var newObjCmd = newObj.command();
 newObjCmd('newAttribute', { name: 'george' }); //calling the object
+```
 
 4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
 
 e.g.
+```javascript
 newObjCmd('thisObj'); //return newObj
+```
 
-### Group
+##### Group
 
-### Group Inheritance 
+##### Group Inheritance 
 
-# Examples
+## Examples
 
 
-# Contributors
+## Contributors
 
 George Zhang < service@mainnote.com >
