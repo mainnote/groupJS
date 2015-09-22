@@ -1,0 +1,28 @@
+{
+  "name": "groupjs",
+  "version": "0.0.1",
+  "description": "A inheritance implementation pattern of grouping javascript objects for instances.",
+  "main": "group.js",
+  "scripts": {
+    "test": "test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mainnote/groupJS.git"
+  },
+  "keywords": [
+    "group",
+    "inheritance"
+  ],
+  "author": "George JX Zhang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mainnote/groupJS/issues"
+  },
+  "homepage": "https://github.com/mainnote/groupJS#readme",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-uglify": "^0.9.2",
+    "grunt-umd": "^2.3.3"
+  }
+}

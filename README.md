@@ -1,3 +1,7 @@
+[logo]: https://github.com/mainnote/groupJS/logo.png "groupJS logo"
+
+![alt text][logo]
+
 ## About groupJS
 
 GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group.
@@ -82,17 +86,15 @@ group.extend({
 
 1. `obj.create(<object name>)` - Create a new object
 
-e.g.
 ```javascript
-var newObj = obj.create('newObj');
+var newObj = Grp.obj.create('newObj');
 var newObj_1 = newObj.create('newObj_1');
 ```
 
 2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.
 
-e.g.
 ```javascript
-var newObj = obj.create('newObj');
+var newObj = Grp.obj.create('newObj');
 newObj.extend({
     newAttribute: function() {
         alert('this is a new attribute');
@@ -102,9 +104,8 @@ newObj.extend({
 
 3. `obj.command()` - return a function which provides simple and restricted interface.
 
-e.g.
 ```javascript
-var newObj = obj.create('newObj');
+var newObj = Grp.obj.create('newObj');
 newObj.extend({
     newAttribute: function(opt) {
         alert('this is a new attribute for ' + opt.name||'');
@@ -117,14 +118,43 @@ newObjCmd('newAttribute', { name: 'george' }); //calling the object
 
 4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
 
-e.g.
 ```javascript
 newObjCmd('thisObj'); //return newObj
 ```
 
 ##### Group
 
-##### Group Inheritance 
+1. `group.join(<member>)` - join a memeber into this group
+```javascript
+//create a member
+var newObj = Grp.obj.create('newObj');
+newObj.extend({
+    newAttribute: function(opt) {
+        alert('this is a new attribute for ' + opt.name||'');
+    },
+});
+
+//create a group
+var newGrp = Grp.group.create('newGrp');
+newGrp.join(newObj);
+newGrp.extend({
+    promptAlert: function(opt) {
+        this.call('newObj', 'newAttribute', opt );
+    },
+});
+
+var grpTest = newGrp.create('grpTest').command();
+var opt = { name: 'grpTest_Name' };
+grpTest('promptAlert', opt);
+```
+2. `group.call()`  - call its own member command
+For group level, `this.call(<memberName>, <memberAttribute>, opt)`
+For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
+
+3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
+
+##### sub-Group
+`parentGroup.join(<group>);
 
 ## Examples
 
