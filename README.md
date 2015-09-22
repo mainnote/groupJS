@@ -85,72 +85,75 @@ group.extend({
 ##### Object Inheritance
 
 1. `obj.create(<object name>)` - Create a new object.
-        ```javascript
-var newObj = Grp.obj.create('newObj');
-var newObj_1 = newObj.create('newObj_1');
-```
+    ```javascript
+    var newObj = Grp.obj.create('newObj');
+    var newObj_1 = newObj.create('newObj_1');
+    ```
 
 2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.    
-        ```javascript
-var newObj = Grp.obj.create('newObj');
-newObj.extend({
-    newAttribute: function() {
-    alert('this is a new attribute');
-    },
-});
-```
+    ```javascript
+    var newObj = Grp.obj.create('newObj');
+    newObj.extend({
+        newAttribute: function() {
+        alert('this is a new attribute');
+        },
+    });
+    ```
 
 3. `obj.command()` - return a function which provides simple and restricted interface.
-...
-```javascript
-var newObj = Grp.obj.create('newObj');
-newObj.extend({
-    newAttribute: function(opt) {
-        alert('this is a new attribute for ' + opt.name||'');
-    },
-});
 
-var newObjCmd = newObj.command();
-newObjCmd('newAttribute', { name: 'george' }); //calling the object
-```
+    ```javascript
+    var newObj = Grp.obj.create('newObj');
+    newObj.extend({
+        newAttribute: function(opt) {
+            alert('this is a new attribute for ' + opt.name||'');
+        },
+    });
+    
+    var newObjCmd = newObj.command();
+    newObjCmd('newAttribute', { name: 'george' }); //calling the object
+    ```
+    
 4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
-```javascript
-newObjCmd('thisObj'); //return newObj
-```
+    ```javascript
+    newObjCmd('thisObj'); //return newObj
+    ```
 
 ##### Group
 
 1. `group.join(<member>)` - join a memeber into this group
-```javascript
-//create a member
-var newObj = Grp.obj.create('newObj');
-newObj.extend({
-    newAttribute: function(opt) {
-        alert('this is a new attribute for ' + opt.name||'');
-    },
-});
-
-//create a group
-var newGrp = Grp.group.create('newGrp');
-newGrp.join(newObj);
-newGrp.extend({
-    promptAlert: function(opt) {
-        this.call('newObj', 'newAttribute', opt );
-    },
-});
-
-var grpTest = newGrp.create('grpTest').command();
-var opt = { name: 'grpTest_Name' };
-grpTest('promptAlert', opt);
-```
+    ```javascript
+    //create a member
+    var newObj = Grp.obj.create('newObj');
+    newObj.extend({
+        newAttribute: function(opt) {
+            alert('this is a new attribute for ' + opt.name||'');
+        },
+    });
+    
+    //create a group
+    var newGrp = Grp.group.create('newGrp');
+    newGrp.join(newObj);
+    newGrp.extend({
+        promptAlert: function(opt) {
+            this.call('newObj', 'newAttribute', opt );
+        },
+    });
+    
+    var grpTest = newGrp.create('grpTest').command();
+    var opt = { name: 'grpTest_Name' };
+    grpTest('promptAlert', opt);
+    ```
 2. `group.call()`  - call its own member command
-For group level, `this.call(<memberName>, <memberAttribute>, opt)`
-For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
+
+    * For group level, `this.call(<memberName>, <memberAttribute>, opt)` 
+    * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
 
 ##### sub-Group
-`parentGroup.join(<group>);`
+
+1. `group.join(<subGroup>)` - join to parent group as member
 
 ## Examples
 
