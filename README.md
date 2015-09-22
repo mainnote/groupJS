@@ -85,21 +85,19 @@ group.extend({
 ##### Object Inheritance
 
 1. `obj.create(<object name>)` - Create a new object.
-...
-```javascript
-var newObj = Grp.obj.create('newObj');
-var newObj_1 = newObj.create('newObj_1');
-```
+    ```javascript
+    var newObj = Grp.obj.create('newObj');
+    var newObj_1 = newObj.create('newObj_1');
+    ```
 2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.
-...
-```javascript
-var newObj = Grp.obj.create('newObj');
-newObj.extend({
-    newAttribute: function() {
+    ```javascript
+    var newObj = Grp.obj.create('newObj');
+    newObj.extend({
+        newAttribute: function() {
         alert('this is a new attribute');
-    },
-});
-```
+        },
+    });
+    ```
 3. `obj.command()` - return a function which provides simple and restricted interface.
 ...
 ```javascript
@@ -144,9 +142,9 @@ var opt = { name: 'grpTest_Name' };
 grpTest('promptAlert', opt);
 ```
 2. `group.call()`  - call its own member command
-```For group level, `this.call(<memberName>, <memberAttribute>, opt)`
+For group level, `this.call(<memberName>, <memberAttribute>, opt)`
 For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
-```
+
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
 
 ##### sub-Group
