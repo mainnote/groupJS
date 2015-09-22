@@ -1,4 +1,4 @@
-[logo]: https://github.com/mainnote/groupJS/logo.png "groupJS logo"
+[logo]: https://github.com/mainnote/groupJS/blob/master/logo.png "groupJS logo"
 
 ![alt text][logo]
 
@@ -85,14 +85,11 @@ group.extend({
 ##### Object Inheritance
 
 1. `obj.create(<object name>)` - Create a new object
-
 ```javascript
 var newObj = Grp.obj.create('newObj');
 var newObj_1 = newObj.create('newObj_1');
 ```
-
 2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.
-
 ```javascript
 var newObj = Grp.obj.create('newObj');
 newObj.extend({
@@ -101,9 +98,7 @@ newObj.extend({
     },
 });
 ```
-
 3. `obj.command()` - return a function which provides simple and restricted interface.
-
 ```javascript
 var newObj = Grp.obj.create('newObj');
 newObj.extend({
@@ -115,9 +110,7 @@ newObj.extend({
 var newObjCmd = newObj.command();
 newObjCmd('newAttribute', { name: 'george' }); //calling the object
 ```
-
 4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
-
 ```javascript
 newObjCmd('thisObj'); //return newObj
 ```
@@ -148,13 +141,13 @@ var opt = { name: 'grpTest_Name' };
 grpTest('promptAlert', opt);
 ```
 2. `group.call()`  - call its own member command
-For group level, `this.call(<memberName>, <memberAttribute>, opt)`
+```For group level, `this.call(<memberName>, <memberAttribute>, opt)`
 For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
-
+```
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
 
 ##### sub-Group
-`parentGroup.join(<group>);
+`parentGroup.join(<group>);`
 
 ## Examples
 
