@@ -1,6 +1,10 @@
 [logo]: https://github.com/mainnote/groupJS/blob/master/logo.png "groupJS logo"
 
-![alt text][logo]
+-> ![alt text][logo] <-
+
+<p align="center">
+  <img src="https://github.com/mainnote/groupJS/blob/master/logo.png" alt="groupJS logo" />
+</p>
 
 ## About groupJS
 
@@ -85,19 +89,19 @@ group.extend({
 ##### Object Inheritance
 
 1. `obj.create(<object name>)` - Create a new object
-```javascript
-var newObj = Grp.obj.create('newObj');
-var newObj_1 = newObj.create('newObj_1');
-```
+...```javascript
+...var newObj = Grp.obj.create('newObj');
+...var newObj_1 = newObj.create('newObj_1');
+...```
 2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.
-```javascript
-var newObj = Grp.obj.create('newObj');
-newObj.extend({
-    newAttribute: function() {
-        alert('this is a new attribute');
-    },
-});
-```
+...```javascript
+...var newObj = Grp.obj.create('newObj');
+...newObj.extend({
+...    newAttribute: function() {
+...        alert('this is a new attribute');
+...    },
+...});
+...```
 3. `obj.command()` - return a function which provides simple and restricted interface.
 ```javascript
 var newObj = Grp.obj.create('newObj');
