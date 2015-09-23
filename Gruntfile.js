@@ -21,14 +21,32 @@ module.exports = function(grunt) {
         }
       },
       
-    }
+    },
+    jasmine : {
+      src : 'dest/group.js',
+      options: {
+        specs: 'test/specs/*Spec.js',
+        helpers: 'spec/*Helper.js'
+      },
+    },
+    watch: {
+      all: {
+        files: ['test/specs/*Spec.js', 'dest/group.js'],
+        tasks: ['jasmine'],
+        options: {
+          spawn: false,
+        },
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-umd');
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task(s).
   grunt.registerTask('default', ['umd', 'uglify']);
-
+  grunt.registerTask('test', ['jasmine']);
 };

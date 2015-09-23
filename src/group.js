@@ -14,25 +14,45 @@ if (!Object.create) {
 var obj = {
     create: function(name){
         var newObj = Object.create(this);
-        if (!name && this.hasOwnProperty('name')) {
-            name = this.name; //name from originate during instance
+        if ( this.hasOwnProperty('parentNames') ){
+            newObj.parentNames = [];
+            var len = this.parentNames.length;
+            for (var i = 0; i < len; i++) {
+                newObj.parentNames.push(this.parentNames[i]);
+            }
         }
+        
+        if ( this.hasOwnProperty('name') ) {
+            if ( !newObj.hasOwnProperty('parentNames') ) newObj.parentNames = [];
+            newObj.parentNames.push(this.name);
+            
+            if ( !name ) {
+                name = this.name; //name from originate during instance
+            }
+        }
+        
         newObj.name = name;
+        
         return newObj;
     },
     extend: function() {
-        for(var i=0; i<arguments.length; i++)
+        for(var i=0; i<arguments.length; i++) {
             var extObj = arguments[i];
             for(var key in extObj)
                 this[key] = extObj[key];
+        }
     },
     command: function() {
         var self = this;
         return function(cmd, opt) {
-            return self[cmd](opt);
+            if (typeof self[cmd] === 'function') {
+                return self[cmd](opt);
+            } else {
+                return self[cmd]; //value
+            }
         };
     },
-    thisObj: function() { //for debug
+    thisObj: function() { 
         return this;
     },
 };
@@ -62,15 +82,38 @@ group.extend({
             }
         }
     },
-    join: function(member) {
-        //add new member in command interface
-        var newMember = member.create(member.name);
-        newMember.group = this;
-        this._memberList[member.name] = newMember.command();
+    join: function() {
+        for(var i=0; i<arguments.length; i++) {
+            var member = arguments[i];
+            //add new member in command interface
+            var newMember = member.create(member.name);
+            newMember.group = this;
+            this._memberList[member.name] = newMember.command();
+        }
     },
     call: function(memberName, methodName, opt) {
-        var memberCmd = this._memberList[memberName];
-        return memberCmd(methodName, opt);
+        var memberCmd;
+        if (memberName in this._memberList) {
+            memberCmd = this._memberList[memberName];
+            return memberCmd(methodName, opt);
+        } else {
+            var prototypeMemberList = this._memberList;
+            for (var key in prototypeMemberList) {
+                var memberCmd = prototypeMemberList[key];
+                if ( typeof memberCmd === 'function' ) {
+                    var member = prototypeMemberList[key]('thisObj');
+                    if ( member.hasOwnProperty('parentNames') ) {
+                        var parentNames = member.parentNames;
+                        var p_len = parentNames.length;
+                        for ( var j=0; j < p_len; j++ ) {
+                            if ( memberName === parentNames[j] ) {
+                                memberCmd(methodName, opt); //no return till all members checked
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
 });
 

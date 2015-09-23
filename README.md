@@ -14,7 +14,7 @@ At first I jumped in the area of Backbone.js and its best friend marionette. The
 
 # Documentation
 
-### Source Code Explaination
+### Take a look at basic code
 
 ```javascript
 var obj = {
@@ -115,13 +115,18 @@ group.extend({
     ```
     
 4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
+
     ```javascript
     newObjCmd('thisObj'); //return newObj
     ```
 
+5. `obj.parentNames` - Array to keep all inherited object's name.
+
+
 ##### Group
 
 1. `group.join(<member>)` - join a memeber into this group
+
     ```javascript
     //create a member
     var newObj = Grp.obj.create('newObj');
@@ -156,7 +161,18 @@ group.extend({
 1. `group.join(<subGroup>)` - join to parent group as member
 
 ## Examples
+1. Check the test cases and you might get some idea
+2. Check example folder
 
+## Build
+
+`grunt`
+
+## Test
+
+```
+grunt test
+```
 
 ## Contributors
 
