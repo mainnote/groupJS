@@ -84,7 +84,7 @@ group.extend({
 ### Usages
 ##### Object Inheritance
 
-1. `obj.create(<object name>)` - Create a new object.
+1. `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
     ```javascript
     var newObj = Grp.obj.create('newObj');
     var newObj_1 = newObj.create('newObj_1');
@@ -125,7 +125,7 @@ group.extend({
 
 ##### Group
 
-1. `group.join(<member>)` - join a memeber into this group
+1. `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
 
     ```javascript
     //create a member
@@ -172,6 +172,10 @@ group.extend({
 
 ```
 grunt test
+```
+or
+```
+grunt watch
 ```
 
 ## Contributors

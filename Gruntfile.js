@@ -23,16 +23,31 @@ module.exports = function(grunt) {
       
     },
     jasmine : {
-      src : 'dest/group.js',
-      options: {
-        specs: 'test/specs/*Spec.js',
-        helpers: 'spec/*Helper.js'
-      },
+        global: {
+          src : 'dest/group.js',
+          options: {
+            specs: 'test/specs/global/*Spec.js',
+            helpers: 'spec/*Helper.js'
+            },
+        },
+        requirejs: {
+          src: 'dest/group.js',
+          options: {
+            specs: 'test/specs/requirejs/*Spec.js',
+            helpers: 'spec/*Helper.js',
+            template: require('grunt-template-jasmine-requirejs'),
+            templateOptions: {
+              requireConfig: {
+                baseUrl: 'dest/',
+              },
+            }
+          }
+        }
     },
     watch: {
       all: {
-        files: ['test/specs/*Spec.js', 'dest/group.js'],
-        tasks: ['jasmine'],
+        files: ['test/specs/**/*Spec.js', 'dest/group.js'],
+        tasks: ['test'],
         options: {
           spawn: false,
         },
@@ -48,5 +63,5 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['umd', 'uglify']);
-  grunt.registerTask('test', ['jasmine']);
+  grunt.registerTask('test', ['jasmine:global', 'jasmine:requirejs']);
 };

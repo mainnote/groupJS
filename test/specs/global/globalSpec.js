@@ -123,7 +123,71 @@ describe("Test suite for module in global scope", function () {
       expect(cityBusCmd('noOfPassenger')).toEqual(0);
   });
   
-  it("sub group of Company case", function() {
+  it("sub group of IT Company case", function() {
+      var Employee = Grp.obj.create('Employee');
+      var BA = Employee.create('BA');
+      BA.extend({
+          designProduct: function(opt) {
+              return true;
+          },
+          verifyProduct: function(opt) {
+              return true;
+          },
+      });
+      var Dev = Employee.create('Dev');
+      Dev.extend({
+          createProduct: function(opt) {
+              return true;
+          },
+      });
+      
+      var Tester = Employee.create('Tester');
+      Tester.extend({
+          testProduct: function(opt) {
+              return true;
+          },
+      });
+      
+      var Team = Grp.group.create('Team');
+      var DevTeam = Team.create('DevTeam');     
+      
+      var TestTeam = Team.create('TestTeam');
+      DevTeam.join(BA, Dev);
+      TestTeam.join(Tester, BA);
+      
+      var Company = Grp.group.create('Company');
+      var ITCompany = Company.create('ITCompany');
+      var CEO = Employee.create('CEO');
+      CEO.extend({
+          requestNewProduct: function(opt) {
+              return this.group.call('DevTeam', 'makeProduct');
+          },
+      });
+      DevTeam.extend({
+          makeProduct: function(opt) {
+              if (this.call('BA', 'designProduct') && this.call('Dev', 'createProduct')) { //ask member
+                  var opt_ = { product: 'Edge' };
+                  return this.group.call('TestTeam', 'testProduct', opt_); //ask parent group
+              }
+          },
+      });
+      TestTeam.extend({
+          testProduct: function(opt) {
+              if (this.call('Tester', 'testProduct') && this.call('BA', 'verifyProduct')) {
+                return opt.product;
+              }
+          },           
+      });
+      ITCompany.extend({
+          releaseNewProduct: function(opt) {
+              return this.call('CEO', 'requestNewProduct');
+          },
+      });
+      ITCompany.join(DevTeam, TestTeam, CEO);
+      
+      var microsoft = ITCompany.create('microsoft').command();
+      
+      expect(microsoft('releaseNewProduct')).toEqual('Edge');
       
   });
 });

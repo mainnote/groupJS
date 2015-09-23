@@ -12,9 +12,9 @@ if (!Object.create) {
 //----------------------------
 
 var obj = {
-    create: function(name){
+    create: function (name) {
         var newObj = Object.create(this);
-        if ( this.hasOwnProperty('parentNames') ){
+        if (this.hasOwnProperty('parentNames')) {
             newObj.parentNames = [];
             var len = this.parentNames.length;
             for (var i = 0; i < len; i++) {
