@@ -119,7 +119,7 @@ group.extend({
     ```
 
 * `obj.parentNames` - Array to keep all inherited object's name.
-
+    
 #### Group
 * `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
 
@@ -151,10 +151,10 @@ group.extend({
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
 * `group.group` - for member, it refers to its group; for group, refers to its parent group.
-
+    
 #### sub-Group
 
-    `group.join(<subGroup>)` - join to parent group as member
+* `group.join(<subGroup>)` - join to parent group as member
     
 
 ## Examples
