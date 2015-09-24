@@ -2,11 +2,11 @@
   <img src="https://github.com/mainnote/groupJS/blob/master/logo.png" alt="groupJS logo" />
 </p>
 
-# About groupJS
+### About groupJS
 
 GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group.
 
-# Why do I need groupJS
+### Why do I need groupJS
 
 As you may already know that javascript takes prototypal inheritance, it creates flexible programming style. However, I am not a big fans of coding with .prototype. all the time (say composition). This method drains up my brain. Thus, I started looking for an implementation pattern fitting myself. 
 
@@ -14,8 +14,7 @@ At first I jumped in the area of Backbone.js and its best friend marionette. The
 
 # Documentation
 
-## Take a look at basic code
-
+### Take a look at basic code
 ```javascript
 var obj = {
     create: function(name){
@@ -82,15 +81,14 @@ group.extend({
 ```
 
 ## Usages
-### Object Inheritance
-
-#### `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
+#### Object Inheritance
+*  `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
     ```javascript
     var newObj = Grp.obj.create('newObj');
     var newObj_1 = newObj.create('newObj_1');
     ```
 
-#### `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.    
+* `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.    
     ```javascript
     var newObj = Grp.obj.create('newObj');
     newObj.extend({
@@ -100,7 +98,7 @@ group.extend({
     });
     ```
 
-#### `obj.command()` - return a function which provides simple and restricted interface.
+* `obj.command()` - return a function which provides simple and restricted interface.
 
     ```javascript
     var newObj = Grp.obj.create('newObj');
@@ -114,17 +112,16 @@ group.extend({
     newObjCmd('newAttribute', { name: 'george' }); //calling the object
     ```
     
-#### for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
+* `obj.thisObj` - for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
 
     ```javascript
     newObjCmd('thisObj'); //return newObj
     ```
 
-#### `obj.parentNames` - Array to keep all inherited object's name.
+* `obj.parentNames` - Array to keep all inherited object's name.
 
-### Group
-
-#### `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
+#### Group
+* `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
 
     ```javascript
     //create a member
@@ -148,34 +145,34 @@ group.extend({
     var opt = { name: 'grpTest_Name' };
     grpTest('promptAlert', opt);
     ```
-#### `group.call()`  - call its own member command
+* `group.call()`  - call its own member command
 
     * For group level, `this.call(<memberName>, <memberAttribute>, opt)` 
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
-#### `group.group` - for member, it refers to its group; for group, refers to its parent group.
+* `group.group` - for member, it refers to its group; for group, refers to its parent group.
 
-### sub-Group
+#### sub-Group
 
     `group.join(<subGroup>)` - join to parent group as member
     
 
-# Examples
-* [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
-* [Check example folder](examples/)
+## Examples
+[Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
+[Check example folder](examples/)
     
 
-# Build
+## Build
     
     grunt
     
 
-# Test
+## Test
 
     grunt test
     or
     grunt watch
 
-# Contributors
+## Contributors
 
 George Zhang < service@mainnote.com >
