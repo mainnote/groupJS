@@ -82,7 +82,7 @@ group.extend({
 
 ## Usages
 #### Object Inheritance
-*  `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
+*`obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
     ```javascript
     var newObj = Grp.obj.create('newObj');
     var newObj_1 = newObj.create('newObj_1');
@@ -158,8 +158,8 @@ group.extend({
     
 
 ## Examples
-[Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
-[Check example folder](examples/)
+1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
+2. [Check example folder](examples/)
     
 
 ## Build
