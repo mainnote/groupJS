@@ -155,7 +155,14 @@ group.extend({
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
 2. [Check example folder](examples/)
-    
+3. In node.js
+    npm install groupjs
+
+    ```javascript
+    var Grp = require('groupjs'); 
+    ```
+4. with requirejs
+    require(['groupjs'], function(Grp){});
 
 ## Build
     
