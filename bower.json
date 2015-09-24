@@ -1,0 +1,28 @@
+{
+  "name": "groupjs",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mainnote/groupJS",
+  "authors": [
+    "George Zhang <service@mainnote.com>"
+  ],
+  "description": "An inheritance implementation pattern of grouping javascript objects for instances.",
+  "main": "build/group.min.js",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node",
+    "yui"
+  ],
+  "keywords": [
+    "group"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
