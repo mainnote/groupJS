@@ -168,6 +168,17 @@ group.extend({
     
     grunt
     
+## Release
+
+To npm, change version number
+npm publish ./
+
+Register in bower
+bower register groupjs git://github.com/mainnote/groupJS.git
+
+Change version in bower, 
+git tag -a 0.0.2 -m "Tagging 0.0.2"
+
 
 ## Test
 
