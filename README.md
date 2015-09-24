@@ -2,11 +2,11 @@
   <img src="https://github.com/mainnote/groupJS/blob/master/logo.png" alt="groupJS logo" />
 </p>
 
-## About groupJS
+# About groupJS
 
 GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group.
 
-## Why do I need groupJS
+# Why do I need groupJS
 
 As you may already know that javascript takes prototypal inheritance, it creates flexible programming style. However, I am not a big fans of coding with .prototype. all the time (say composition). This method drains up my brain. Thus, I started looking for an implementation pattern fitting myself. 
 
@@ -14,7 +14,7 @@ At first I jumped in the area of Backbone.js and its best friend marionette. The
 
 # Documentation
 
-### Take a look at basic code
+## Take a look at basic code
 
 ```javascript
 var obj = {
@@ -81,8 +81,8 @@ group.extend({
 });
 ```
 
-### Usages
-##### Object Inheritance
+## Usages
+### Object Inheritance
 
 1. `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
     ```javascript
@@ -123,7 +123,7 @@ group.extend({
 5. `obj.parentNames` - Array to keep all inherited object's name.
     
 
-##### Group
+### Group
 
 1. `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
 
@@ -157,31 +157,27 @@ group.extend({
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
     
 
-##### sub-Group
+### sub-Group
 
-    1. `group.join(<subGroup>)` - join to parent group as member
+1. `group.join(<subGroup>)` - join to parent group as member
     
 
-## Examples
-    1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
-    2. [Check example folder](examples/)
+# Examples
+1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
+2. [Check example folder](examples/)
     
 
-## Build
+# Build
     
-    `grunt`
+    grunt
     
 
-## Test
+# Test
 
-    ```
     grunt test
-    ```
     or
-    ```
     grunt watch
-    ```
 
-## Contributors
+# Contributors
 
 George Zhang < service@mainnote.com >
