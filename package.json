@@ -1,7 +1,7 @@
 {
   "name": "groupjs",
   "version": "0.0.1",
-  "description": "A inheritance implementation pattern of grouping javascript objects for instances.",
+  "description": "An inheritance implementation pattern of grouping javascript objects for instances.",
   "main": "build/group.min.js",
   "scripts": {
     "test": "test/test.js"
