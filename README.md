@@ -84,13 +84,13 @@ group.extend({
 ## Usages
 ### Object Inheritance
 
-1. `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
+#### `obj.create(<object name>)` - Create a new object. <object name> should be identifier of an object. 
     ```javascript
     var newObj = Grp.obj.create('newObj');
     var newObj_1 = newObj.create('newObj_1');
     ```
 
-2. `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.    
+#### `obj.extend( obj1 [, obj2, ......] )` - extend object's attributes. If attribute exists, it will be overriden.    
     ```javascript
     var newObj = Grp.obj.create('newObj');
     newObj.extend({
@@ -100,7 +100,7 @@ group.extend({
     });
     ```
 
-3. `obj.command()` - return a function which provides simple and restricted interface.
+#### `obj.command()` - return a function which provides simple and restricted interface.
 
     ```javascript
     var newObj = Grp.obj.create('newObj');
@@ -114,18 +114,17 @@ group.extend({
     newObjCmd('newAttribute', { name: 'george' }); //calling the object
     ```
     
-4. for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
+#### for debug purpose, you may want to access object itself. There is an attribute "thisObj" to return object itself.
 
     ```javascript
     newObjCmd('thisObj'); //return newObj
     ```
 
-5. `obj.parentNames` - Array to keep all inherited object's name.
-```
-```
+#### `obj.parentNames` - Array to keep all inherited object's name.
+
 ### Group
 
-1. `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
+#### `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
 
     ```javascript
     //create a member
@@ -149,22 +148,21 @@ group.extend({
     var opt = { name: 'grpTest_Name' };
     grpTest('promptAlert', opt);
     ```
-2. `group.call()`  - call its own member command
+#### `group.call()`  - call its own member command
 
     * For group level, `this.call(<memberName>, <memberAttribute>, opt)` 
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
-3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
-```
-```
+#### `group.group` - for member, it refers to its group; for group, refers to its parent group.
+
 ### sub-Group
 
-1. `group.join(<subGroup>)` - join to parent group as member
+    `group.join(<subGroup>)` - join to parent group as member
     
 
 # Examples
-1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
-2. [Check example folder](examples/)
+* [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
+* [Check example folder](examples/)
     
 
 # Build
