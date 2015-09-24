@@ -121,7 +121,7 @@ group.extend({
 * `obj.parentNames` - Array to keep all inherited object's name.
     
 #### Group
-* `group.join(<member>)` - join a memeber into this group. If member name exists, the member will be overriden.
+* `group.join(<member or sub-Group>[, <member2 or sub-Group2>...])` - join a memeber into this group. If member name exists, the member will be overriden.
 
     ```javascript
     //create a member
@@ -150,12 +150,7 @@ group.extend({
     * For group level, `this.call(<memberName>, <memberAttribute>, opt)` 
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
-* `group.group` - for member, it refers to its group; for group, refers to its parent group.
-    
-#### sub-Group
-
-* `group.join(<subGroup>)` - join to parent group as member
-    
+* `group.group` - for member, it refers to its group; for group, refers to its parent group.  
 
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
