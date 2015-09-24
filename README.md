@@ -121,7 +121,7 @@ group.extend({
     ```
 
 5. `obj.parentNames` - Array to keep all inherited object's name.
-
+    
 
 ##### Group
 
@@ -155,28 +155,32 @@ group.extend({
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
+    
 
 ##### sub-Group
 
-1. `group.join(<subGroup>)` - join to parent group as member
+    1. `group.join(<subGroup>)` - join to parent group as member
+    
 
 ## Examples
-1. Check the test cases and you might get some idea
-2. Check example folder
+    1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
+    2. [Check example folder](examples/)
+    
 
 ## Build
-
-`grunt`
+    
+    `grunt`
+    
 
 ## Test
 
-```
-grunt test
-```
-or
-```
-grunt watch
-```
+    ```
+    grunt test
+    ```
+    or
+    ```
+    grunt watch
+    ```
 
 ## Contributors
 
