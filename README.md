@@ -121,7 +121,6 @@ group.extend({
     ```
 
 5. `obj.parentNames` - Array to keep all inherited object's name.
-    
 ```
 ```
 ### Group
@@ -156,7 +155,6 @@ group.extend({
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
 3. `group.group` - for member, it refers to its group; for group, refers to its parent group.
-    
 ```
 ```
 ### sub-Group
