@@ -123,7 +123,7 @@ group.extend({
 			_setMethod(methodName, member); //override specific attribute. Even the one might exist.
 		} else {
 			for (var key in member) {
-                if (!(key in this)) { //skip those attributes exist in group
+                if (!(key in group)) { //skip those attributes exist in group (not this!!!)
                     _setMethod(key, member);
                 }
 			}
