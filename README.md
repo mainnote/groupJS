@@ -4,13 +4,13 @@
 
 ### About groupJS
 
-GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group.
+GroupJS is an implementation pattern of grouping objects for so-called "instances" purpose. Instead of putting all attributes in a single object, it is recommended to create an object as a group object to manage and connect other objects called members. In the group object, there is a member list to maintain the relationship between group object and its members. Group object acts as a communicator between members. It also provides a single interface outside the group. Thus, object gets its own freedom of evolving its function without changing interaction of another object (class). 
 
 ### Why do I need groupJS
 
-As you may already know that javascript takes prototypal inheritance, it creates flexible programming style. However, I am not a big fans of coding with .prototype. all the time (say composition). This method drains up my brain. Thus, I started looking for an implementation pattern fitting myself. 
+(As you may already know that javascript takes prototypal inheritance, it creates flexible programming style. However, I am not a big fans of coding with .prototype. all the time (say composition). This method drains up my brain. Thus, I started looking for an implementation pattern fitting myself. 
 
-At first I jumped in the area of Backbone.js and its best friend marionette. They are kind of "Event Driven" as far as I understand, which turn object having receiving message function. They are surly a brilliant set. But I think they are still too flexible in terms of coding style. That is why I came up with a simple idea: "Create a object group to bridge other objects."
+At first I jumped in the area of Backbone.js and its best friend marionette. They are kind of "Event Driven" as far as I understand, which turn object having receiving message function. They are surly a brilliant set. But I think they are still too flexible in terms of coding style. That is why I came up with a simple idea: "Create a object group to bridge other objects.")
 
 # Documentation
 
@@ -152,6 +152,11 @@ group.extend({
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
 
 * `group.group` - for member, it refers to its group; for group, refers to its parent group.  
+
+* `group.setCallToMember(<memberName>, [<methodName>])`  - a convenient way to port all functions/single method of a specific member to group level
+
+    * <methodName> is optional.
+
 
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
