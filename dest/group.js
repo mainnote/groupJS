@@ -26,28 +26,28 @@ if (!Object.create) {
 	};
 }
 if (!Function.prototype.bind) {
-  Function.prototype.bind = function(oThis) {
-    if (typeof this !== 'function') {
-      // closest thing possible to the ECMAScript 5
-      // internal IsCallable function
-      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-    }
+	Function.prototype.bind = function (oThis) {
+		if (typeof this !== 'function') {
+			// closest thing possible to the ECMAScript 5
+			// internal IsCallable function
+			throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+		}
 
-    var aArgs   = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
-          return fToBind.apply(this instanceof fNOP && oThis
-                 ? this
-                 : oThis,
-                 aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
+		var aArgs = Array.prototype.slice.call(arguments, 1),
+		fToBind = this,
+		fNOP = function () {},
+		fBound = function () {
+			return fToBind.apply(this instanceof fNOP && oThis
+				 ? this
+				 : oThis,
+				aArgs.concat(Array.prototype.slice.call(arguments)));
+		};
 
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
 
-    return fBound;
-  };
+		return fBound;
+	};
 }
 //----------------------------
 
@@ -157,23 +157,105 @@ group.extend({
 	},
 	/* call through to specific member whom play as a major role*/
 	setCallToMember : function (memberName, methodName) {
-        var that = this;
+		var that = this;
 		var member = this.call(memberName, 'thisObj');
-		if (methodName) {
-			_setMethod(methodName, member); //override specific attribute. Even the one might exist.
-		} else {
-			for (var key in member) {
-                if (!(key in group)) { //skip those attributes exist in group (not this!!!)
-                    _setMethod(key, member);
-                }
+		if (member) {
+			if (!this._callToMembers)
+				this._callToMembers = [];
+			this._callToMembers.push({
+				name : memberName,
+				method : methodName
+			});
+
+			if (methodName) {
+				_setMethod(methodName, member); //override specific attribute. Even the one might exist.
+			} else {
+				for (var key in member) {
+					_setMethod(key, member);
+				}
+			}
+
+			function _setMethod(attribute, memberObj) {
+				if (!(attribute in group)
+					 && attribute != 'parentNames'
+					 && attribute != 'group'
+					 && attribute != '_memberList'
+					 && attribute != 'name'
+					 && attribute != '_callToMembers') { //skip those attributes exist in group!!!
+					if (typeof memberObj[attribute] === 'function' && !memberObj[attribute].binded) {
+						that[attribute] = memberObj[attribute].bind(memberObj);
+						that[attribute].binded = true;
+					} else {
+						that[attribute] = memberObj[attribute];
+					}
+				}
 			}
 		}
+	},
 
-		function _setMethod(attribute, memberObj) {
-			if (typeof memberObj[attribute] === 'function') {
-				that[attribute] = memberObj[attribute].bind(memberObj);
+	members : function () {
+		function _getMember(memberList) {
+			var ms = [];
+			for (var key in memberList) {
+				var member = {
+					name : key,
+				};
+				var memberObj = memberList[key]('thisObj');
+				if (memberObj.hasOwnProperty('_memberList')) {
+					member['members'] = _getMember(memberObj._memberList);
+				}
+				ms.push(member);
+			}
+			return ms;
+		}
+		return _getMember(this._memberList);
+	},
+
+	override : function (newMember, memberMap) {
+		if (newMember) {
+			if (memberMap && typeof memberMap === 'object' && memberMap.constructor === Array) {
+				//only override the ones in map
+				_overrideMemberInMap(memberMap, this);
+
+				function _overrideMemberInMap(map, thisGroup) {
+					if (Object.prototype.toString.call(map) === '[object Array]') {
+						var len = map.length;
+						for (var i = 0; i < len; i++) {
+							//if level down
+							if (map[i].hasOwnProperty('members')) {
+								_overrideMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
+							} else {
+								_overrideMember(thisGroup);
+							}
+						}
+					}
+				}
+
 			} else {
-				that[attribute] = memberObj[attribute];
+				//override all member with the same name
+				_overrideMember(this);
+			}
+
+			function _overrideMember(thisGroup) {
+				//console.log('group -' + thisGroup.name);
+				if (thisGroup.hasOwnProperty('_memberList')) {
+					for (var key in thisGroup._memberList) {
+						var memberObj = thisGroup._memberList[key]('thisObj');
+						if (memberObj.name === newMember.name) {
+							//console.log('join -' + memberObj.name);
+							thisGroup.join(newMember);
+							if (thisGroup.hasOwnProperty('_callToMembers')) { //reset setCallToMembers
+								var len = thisGroup._callToMembers.length;
+								for (var i = 0; i < len; i++) {
+									var toMem = thisGroup._callToMembers[i];
+									thisGroup.setCallToMember(toMem.name, toMem.method);
+								}
+							}
+						} else if (memberObj.hasOwnProperty('_memberList')) {
+							_overrideMember(memberObj);
+						}
+					}
+				}
 			}
 		}
 	},

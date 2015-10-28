@@ -197,9 +197,7 @@ describe("Test suite for module in global scope", function () {
 		ITCompany.join(DevTeam, TestTeam, CEO);
 
 		var microsoft = ITCompany.create('microsoft').command();
-
 		expect(microsoft('releaseNewProduct')).toEqual('Edge');
-
 	});
 
 	it("test setCallToMember", function () {
@@ -227,4 +225,63 @@ describe("Test suite for module in global scope", function () {
         expect(childrenGrpCmd('smile')).toEqual('smiling');
 	});
 
+	it("test multi level groups", function () {
+		var a0 = Grp.obj.create('a0');
+        var a1 = Grp.obj.create('a1');
+        var a2 = Grp.obj.create('a2');
+        var g0 = Grp.group.create('g0');
+        g0.join(a0, a1, a2);
+        
+        var b0 = Grp.obj.create('b0');
+        var b1 = Grp.obj.create('b1');
+        var b2 = Grp.obj.create('b2');
+        b2.extend({
+            say: function(){return 'I am b2';},
+        });
+        var g1 = Grp.group.create('g1');
+        g1.join(b0, b1, b2, g0);
+        g1.setCallToMember('b2');
+        g1.extend({
+            sayg1: function() {},
+        });
+        
+        var b01 = Grp.obj.create('b01');
+        var b11 = Grp.obj.create('b11');
+        var b21 = Grp.obj.create('b21');
+        var g11 = Grp.group.create('g11');
+        g11.join(b01, b11, b21);
+        
+        var c0 = Grp.obj.create('c0');
+        var c1 = Grp.obj.create('c1');
+        var c2 = Grp.obj.create('c2');
+        var g2 = Grp.group.create('g2');
+        g2.join(c0, c1, c2, g1, g11);
+        g2.setCallToMember('g1');
+        
+        var members = g2.members();
+        console.log('members - ' + JSON.stringify(members));
+        
+        expect(members[3].members[3].members[0].name).toEqual('a0');
+        
+        var xx = Grp.obj.create('b2');
+        xx.extend({
+            say: function(){return 'hi';},
+        });
+        g2.override(xx);
+        //console.log('members', JSON.stringify(g2.members()));
+        //expect(g2.command()('say')).toEqual('hi');
+        expect(g2.say()).toEqual('hi');
+        /*
+        for (var key in b2){
+            console.log('b2 key: ' + key);
+        }
+        for (var key in g1){
+            console.log('g1 key: ' + key);
+        }
+        for (var key in g2){
+            console.log('g2 key: ' + key);
+        }*/
+        
+        expect(g2.call('g1', 'thisObj').call('b2', 'thisObj').say()).toEqual('hi');
+	});
 });
