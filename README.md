@@ -157,6 +157,9 @@ group.extend({
 
     * <methodName> is optional.
 
+* `group.members()` - show a map of this group's members. This is to be used in `group.override(newMember, memberMap)` .
+
+* `group.override(newMember[, memberMap])` - override a member in this group. This function will go deep to each level and replace the member with the same name. If memberMap is specified, only the specified path will be search for overridden. 
 
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
@@ -183,7 +186,7 @@ group.extend({
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower, 
-    git tag -a 0.0.5 -m "Tagging 0.0.5"
+    git tag -a 0.0.6 -m "Tagging 0.0.5"
 
 
 ## Test

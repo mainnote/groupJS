@@ -221,25 +221,35 @@ group.extend({
 			}
 
 			function _overrideMember(thisGroup) {
-				//console.log('group -' + thisGroup.name);
+                var reset = false;
 				if (thisGroup.hasOwnProperty('_memberList')) {
 					for (var key in thisGroup._memberList) {
 						var memberObj = thisGroup._memberList[key]('thisObj');
 						if (memberObj.name === newMember.name) {
-							//console.log('join -' + memberObj.name);
 							thisGroup.join(newMember);
-							if (thisGroup.hasOwnProperty('_callToMembers')) { //reset setCallToMembers
-								var len = thisGroup._callToMembers.length;
-								for (var i = 0; i < len; i++) {
-									var toMem = thisGroup._callToMembers[i];
-									thisGroup.setCallToMember(toMem.name, toMem.method);
-								}
-							}
+                            reset = _resetCallToMember(thisGroup);
 						} else if (memberObj.hasOwnProperty('_memberList')) {
-							_overrideMember(memberObj);
+                            if (_overrideMember(memberObj)) {
+                                reset = _resetCallToMember(thisGroup);
+                            }
 						}
 					}
+                    
 				}
+
+				function _resetCallToMember(thisGrp) {
+					if ('_callToMembers' in thisGrp) { //reset setCallToMembers and level up
+						var len = thisGrp._callToMembers.length;
+						for (var i = 0; i < len; i++) {
+							var toMem = thisGrp._callToMembers[i];
+							thisGrp.setCallToMember(toMem.name, toMem.method);
+						}
+                        return true;
+					}
+                    return false;
+				}
+                
+                return reset;
 			}
 		}
 	},
