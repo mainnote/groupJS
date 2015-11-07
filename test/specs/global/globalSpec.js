@@ -235,13 +235,15 @@ describe("Test suite for module in global scope", function () {
 		childrenGrp.join(dog);
 		childrenGrp.setCallToMember('dog');
 		expect(childrenGrpCmd('bark')).toEqual('barking');
+        
+        var childMbr = childrenGrp.getMember('child').create();
 
-		child.extend({
+		childMbr.extend({
 			smile : function () {
 				return 'haha';
 			},
 		});
-        childrenGrp.override(child);
+        childrenGrp.override(childMbr);
         expect(childrenGrpCmd('smile')).toEqual('haha');
 	});
 
@@ -277,6 +279,12 @@ describe("Test suite for module in global scope", function () {
 		var c1 = Grp.obj.create('c1');
 		var c2 = Grp.obj.create('c2');
 		var g2 = Grp.group.create('g2');
+        
+        c1.extend({
+            sing: function(opt){
+                return 'music';
+            }
+        });
 		g2.join(c0, c1, c2, g1, g11);
 		g2.setCallToMember('g1');
 
@@ -316,5 +324,24 @@ describe("Test suite for module in global scope", function () {
 		});
 		g2.override(yy, map);
 		expect(g2.call('g1', 'thisObj').call('g0', 'thisObj').call('a0', 'thisObj').yell()).toEqual('yeah!');
+        
+        var newC1 = g2.getMember('c1').create();
+        newC1.extend({
+            ask: function(opt){
+                return this.sing();
+            },
+        })
+        g2.override(newC1);
+        expect(g2.call('c1', 'ask')).toEqual('music');
+        
+        var newA0 = g2.getMember('a0', map).create();
+        expect(newA0.yell()).toEqual('yeah!');
+        expect(g2.getMember('x99')).toEqual(null);
+        expect(g2.getMember('b2').name).toEqual('b2');
+        
+        /*
+        console.log(JSON.stringify(g2.members()));
+        [{"name":"c0"},{"name":"c1"},{"name":"c2"},{"name":"g1","members":[{"name":"b0"},{"name":"b1"},{"name":"b2"},{"name":"g0","members":[{"name":"a0"},{"name":"a1"},{"name":"a2"}]}]},{"name":"g11","members":[{"name":"b01"},{"name":"b11"},{"name":"b21"},{"name":"b2"}]}] */
+        
 	});
 });

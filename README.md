@@ -159,6 +159,8 @@ group.extend({
 
 * `group.members()` - show a map of this group's members. This is to be used in `group.override(newMember, memberMap)` .
 
+* `group.getMember(memberName[, memberMap])` - get a member by name.
+
 * `group.override(newMember[, memberMap])` - override a member in this group. This function will go deep to each level and replace the member with the same name. If memberMap is specified, only the specified path will be search for overridden. 
 
 ## Examples
@@ -186,7 +188,7 @@ group.extend({
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower, 
-    git tag -a 0.0.7 -m "Tagging 0.0.7"
+    git tag -a 0.0.8 -m "Tagging 0.0.8"
 
 
 ## Test
