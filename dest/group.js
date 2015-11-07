@@ -194,7 +194,8 @@ group.extend({
 	},
 
 	members : function () {
-		function _getMember(memberList) {
+		function _getMember(thisGroup) {
+            var memberList = thisGroup._memberList;
 			var ms = [];
 			for (var key in memberList) {
 				var member = {
@@ -202,14 +203,55 @@ group.extend({
 				};
 				var memberObj = memberList[key]('thisObj');
 				if (memberObj.hasOwnProperty('_memberList')) {
-					member['members'] = _getMember(memberObj._memberList);
+					member['members'] = _getMember(memberObj);
 				}
 				ms.push(member);
 			}
 			return ms;
 		}
-		return _getMember(this._memberList);
+		return _getMember(this);
 	},
+    
+    getMember : function(memberName, memberMap){
+        if (memberMap && typeof memberMap === 'object' && memberMap.constructor === Array) {
+            //find the first one in map
+            return _findMemberInMap(memberMap, this);
+            
+            function _findMemberInMap(map, thisGroup) {
+                if (Object.prototype.toString.call(map) === '[object Array]' && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
+                    var len = map.length;
+                    for (var i = 0; i < len; i++) {
+                        //if level down
+                        if (map[i].hasOwnProperty('members')) {
+                            var member = _findMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
+                            if (member) return member;
+                        } else {
+                            return _getMember(thisGroup);
+                        }
+                    }
+                }
+                return null;
+            }
+        } else {
+            //get the first matched member if memberMap not specified
+            return _getMember(this);
+        }
+        
+        function _getMember(thisGroup) {
+            var memberList = thisGroup._memberList;
+            if (memberName in memberList) {
+                return memberList[memberName]('thisObj');
+            } else {
+                for (var key in memberList) {
+                    var memberObj = memberList[key]('thisObj');
+                    if (memberObj.hasOwnProperty('_memberList')) {
+                        return _getMember(memberObj);
+                    }
+                }
+            }
+            return null;
+		}
+    },
 
 	override : function (newMember, memberMap) {
 		if (newMember) {
@@ -218,7 +260,7 @@ group.extend({
 				_overrideMemberInMap(memberMap, this);
 
 				function _overrideMemberInMap(map, thisGroup) {
-					if (Object.prototype.toString.call(map) === '[object Array]') {
+					if (Object.prototype.toString.call(map) === '[object Array]' && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
 						var len = map.length;
 						for (var i = 0; i < len; i++) {
 							//if level down
