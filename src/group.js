@@ -138,6 +138,7 @@ group.extend({
 				}
 			}
 		}
+        //if not found, should we leave error?
 	},
 	/* call through to specific member whom play as a major role*/
 	setCallToMember : function (memberName, methodName) {
