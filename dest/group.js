@@ -49,6 +49,11 @@ if (!Function.prototype.bind) {
 		return fBound;
 	};
 }
+if (typeof Array.isArray === 'undefined') {
+  Array.isArray = function(obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]';
+  }
+};
 //----------------------------
 
 var obj = {
@@ -154,6 +159,7 @@ group.extend({
 				}
 			}
 		}
+        //if not found, should we leave error?
 	},
 	/* call through to specific member whom play as a major role*/
 	setCallToMember : function (memberName, methodName) {
@@ -213,12 +219,12 @@ group.extend({
 	},
     
     getMember : function(memberName, memberMap){
-        if (memberMap && typeof memberMap === 'object' && memberMap.constructor === Array) {
+        if (memberMap && Array.isArray(memberMap)) {
             //find the first one in map
             return _findMemberInMap(memberMap, this);
             
             function _findMemberInMap(map, thisGroup) {
-                if (Object.prototype.toString.call(map) === '[object Array]' && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
+                if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
                     var len = map.length;
                     for (var i = 0; i < len; i++) {
                         //if level down
@@ -255,12 +261,12 @@ group.extend({
 
 	override : function (newMember, memberMap) {
 		if (newMember) {
-			if (memberMap && typeof memberMap === 'object' && memberMap.constructor === Array) {
+			if (memberMap && Array.isArray(memberMap)) {
 				//only override the ones in map
 				_overrideMemberInMap(memberMap, this);
 
 				function _overrideMemberInMap(map, thisGroup) {
-					if (Object.prototype.toString.call(map) === '[object Array]' && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
+					if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
 						var len = map.length;
 						for (var i = 0; i < len; i++) {
 							//if level down
