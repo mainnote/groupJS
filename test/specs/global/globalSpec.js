@@ -4,23 +4,37 @@ describe("Test suite for module in global scope", function () {
 	});
 
 	it("object inheritance of Animal case", function () {
-		window.LOG = function (msg, type) {
-			if (typeof(msg) != 'string') {
-                if (msg == undefined) return;
-                
-				msg = JSON.stringify(msg);
-			}
-
+		window.LOG = function (msg, type, result) {
 			if (window.console) {
+                if (msg == undefined) {
+                    return;
+                } else if (typeof(msg) != 'string') {
+                    msg = JSON.stringify(msg);
+                }
+                
 				if (type) {
 					if (type == 'info' && window.console.info) {
 						return window.console.info(msg);
 					} else if (type == 'error' && window.console.error) {
 						return window.console.error(msg);
+					} else if (typeof(type) != 'string') {
+						if (type == undefined) {
+							type = '';
+						} else {
+							type = '( ' + JSON.stringify(type) + ' )';
+						}
 					}
+				} else {
+					type = '';
 				}
+                
+                if (result == undefined) {
+                    result = '';
+                } else {
+                    result = ' === ' + JSON.stringify(result);
+                }
 
-				return window.console.log(msg);
+				return window.console.log(msg + type + result);
 			}
 		};
 

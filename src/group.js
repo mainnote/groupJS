@@ -90,19 +90,24 @@ var obj = {
 		return function (cmd, opt) {
 			if (typeof self[cmd] === 'function') {
 				if (window.LOG) {
+                    var result = self[cmd](opt);
 					if (!(reservedAttr(cmd))) {
-						LOG(self.name + ' -> ' + cmd);
-						LOG(opt);
+						LOG(self.name + ' -> ' + cmd, opt, result);
 					}
-				}
-				return self[cmd](opt);
+                    return result;
+				} else {
+                    return self[cmd](opt);
+                }
 			} else {
 				if (window.LOG) {
+                    var result = self[cmd];
 					if (!(reservedAttr(cmd))) {
-						LOG(self.name + '.' + cmd);
+						LOG(self.name + '.' + cmd, '', result);
 					}
-				}
-				return self[cmd]; //value
+                    return result;
+				} else {
+                    return self[cmd]; //value
+                }
 			}
 		};
 	},
@@ -149,10 +154,12 @@ group.extend({
 		if (memberName in this._memberList) {
 			memberCmd = this._memberList[memberName];
 			if (window.LOG) {
-				LOG(this.name + ' => ' + memberName);
-				LOG(opt);
-			}
-			return memberCmd(methodName, opt);
+                var result = memberCmd(methodName, opt);
+				LOG(this.name + ' => ' + memberName, opt, result);
+                return result;
+			} else {
+                return memberCmd(methodName, opt);
+            }
 		} else {
 			var prototypeMemberList = this._memberList;
 			for (var key in prototypeMemberList) {
@@ -165,10 +172,11 @@ group.extend({
 						for (var j = 0; j < p_len; j++) {
 							if (memberName === parentNames[j]) {
 								if (window.LOG) {
-									LOG(this.name + ' => ' + memberName);
-									LOG(opt);
-								}
-								memberCmd(methodName, opt); //no return till all members checked
+                                    var result = memberCmd(methodName, opt);
+									LOG(this.name + ' => ' + memberName, opt, result);
+								} else {
+                                    memberCmd(methodName, opt); //no return till all members checked
+                                }
 							}
 						}
 					}
