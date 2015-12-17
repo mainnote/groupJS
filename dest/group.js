@@ -55,6 +55,19 @@ if (typeof Array.isArray === 'undefined') {
 	}
 };
 //----------------------------
+function reservedAttr(attribute) {
+	if ((attribute in obj)
+		 || (attribute in group)
+		 || attribute === 'parentNames'
+		 || attribute === 'group'
+		 || attribute === '_memberList'
+		 || attribute === 'name'
+		 || attribute === '_callToMembers') {
+		return true;
+	} else {
+		return false;
+	}
+};
 
 var obj = {
 	create : function (name) {
@@ -92,15 +105,19 @@ var obj = {
 		var self = this;
 		return function (cmd, opt) {
 			if (typeof self[cmd] === 'function') {
-                if (window.LOG) {
-                    LOG('method ' + cmd + ' will be called with opt: ');
-                    LOG(opt);
-                }
+				if (window.LOG) {
+					if (!(reservedAttr(cmd))) {
+						LOG(self.name + ' -> ' + cmd);
+						LOG(opt);
+					}
+				}
 				return self[cmd](opt);
 			} else {
-                if (window.LOG) {
-                    LOG('return the value of attribute ' + cmd);
-                }
+				if (window.LOG) {
+					if (!(reservedAttr(cmd))) {
+						LOG(self.name + '.' + cmd);
+					}
+				}
 				return self[cmd]; //value
 			}
 		};
@@ -148,7 +165,7 @@ group.extend({
 		if (memberName in this._memberList) {
 			memberCmd = this._memberList[memberName];
 			if (window.LOG) {
-				LOG('member ' + memberName + ' will be invoked with opt: ');
+				LOG(this.name + ' => ' + memberName);
 				LOG(opt);
 			}
 			return memberCmd(methodName, opt);
@@ -164,7 +181,7 @@ group.extend({
 						for (var j = 0; j < p_len; j++) {
 							if (memberName === parentNames[j]) {
 								if (window.LOG) {
-									LOG('member ' + memberName + ' will be invoked with opt: ');
+									LOG(this.name + ' => ' + memberName);
 									LOG(opt);
 								}
 								memberCmd(methodName, opt); //no return till all members checked
@@ -176,6 +193,7 @@ group.extend({
 		}
 		//if not found, should we leave error?
 	},
+
 	/* call through to specific member whom play as a major role*/
 	setCallToMember : function (memberName, methodName) {
 		var that = this;
@@ -197,12 +215,7 @@ group.extend({
 			}
 
 			function _setMethod(attribute, memberObj) {
-				if (!(attribute in group)
-					 && attribute != 'parentNames'
-					 && attribute != 'group'
-					 && attribute != '_memberList'
-					 && attribute != 'name'
-					 && attribute != '_callToMembers') { //skip those attributes exist in group!!!
+				if (!reservedAttr(attribute)) { //skip those attributes exist in group!!!
 					if (typeof memberObj[attribute] === 'function' && !memberObj[attribute].binded) {
 						that[attribute] = memberObj[attribute].bind(memberObj);
 						that[attribute].binded = true;
