@@ -50,9 +50,9 @@ if (!Function.prototype.bind) {
 	};
 }
 if (typeof Array.isArray === 'undefined') {
-  Array.isArray = function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-  }
+	Array.isArray = function (obj) {
+		return Object.prototype.toString.call(obj) === '[object Array]';
+	}
 };
 //----------------------------
 
@@ -92,8 +92,15 @@ var obj = {
 		var self = this;
 		return function (cmd, opt) {
 			if (typeof self[cmd] === 'function') {
+                if (window.LOG) {
+                    LOG('method ' + cmd + ' will be called with opt: ');
+                    LOG(opt);
+                }
 				return self[cmd](opt);
 			} else {
+                if (window.LOG) {
+                    LOG('return the value of attribute ' + cmd);
+                }
 				return self[cmd]; //value
 			}
 		};
@@ -140,6 +147,10 @@ group.extend({
 		var memberCmd;
 		if (memberName in this._memberList) {
 			memberCmd = this._memberList[memberName];
+			if (window.LOG) {
+				LOG('member ' + memberName + ' will be invoked with opt: ');
+				LOG(opt);
+			}
 			return memberCmd(methodName, opt);
 		} else {
 			var prototypeMemberList = this._memberList;
@@ -152,6 +163,10 @@ group.extend({
 						var p_len = parentNames.length;
 						for (var j = 0; j < p_len; j++) {
 							if (memberName === parentNames[j]) {
+								if (window.LOG) {
+									LOG('member ' + memberName + ' will be invoked with opt: ');
+									LOG(opt);
+								}
 								memberCmd(methodName, opt); //no return till all members checked
 							}
 						}
@@ -159,7 +174,7 @@ group.extend({
 				}
 			}
 		}
-        //if not found, should we leave error?
+		//if not found, should we leave error?
 	},
 	/* call through to specific member whom play as a major role*/
 	setCallToMember : function (memberName, methodName) {
@@ -201,7 +216,7 @@ group.extend({
 
 	members : function () {
 		function _getMember(thisGroup) {
-            var memberList = thisGroup._memberList;
+			var memberList = thisGroup._memberList;
 			var ms = [];
 			for (var key in memberList) {
 				var member = {
@@ -217,47 +232,48 @@ group.extend({
 		}
 		return _getMember(this);
 	},
-    
-    getMember : function(memberName, memberMap){
-        if (memberMap && Array.isArray(memberMap)) {
-            //find the first one in map
-            return _findMemberInMap(memberMap, this);
-            
-            function _findMemberInMap(map, thisGroup) {
-                if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
-                    var len = map.length;
-                    for (var i = 0; i < len; i++) {
-                        //if level down
-                        if (map[i].hasOwnProperty('members')) {
-                            var member = _findMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
-                            if (member) return member;
-                        } else {
-                            return _getMember(thisGroup);
-                        }
-                    }
-                }
-                return null;
-            }
-        } else {
-            //get the first matched member if memberMap not specified
-            return _getMember(this);
-        }
-        
-        function _getMember(thisGroup) {
-            var memberList = thisGroup._memberList;
-            if (memberName in memberList) {
-                return memberList[memberName]('thisObj');
-            } else {
-                for (var key in memberList) {
-                    var memberObj = memberList[key]('thisObj');
-                    if (memberObj.hasOwnProperty('_memberList')) {
-                        return _getMember(memberObj);
-                    }
-                }
-            }
-            return null;
+
+	getMember : function (memberName, memberMap) {
+		if (memberMap && Array.isArray(memberMap)) {
+			//find the first one in map
+			return _findMemberInMap(memberMap, this);
+
+			function _findMemberInMap(map, thisGroup) {
+				if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
+					var len = map.length;
+					for (var i = 0; i < len; i++) {
+						//if level down
+						if (map[i].hasOwnProperty('members')) {
+							var member = _findMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
+							if (member)
+								return member;
+						} else {
+							return _getMember(thisGroup);
+						}
+					}
+				}
+				return null;
+			}
+		} else {
+			//get the first matched member if memberMap not specified
+			return _getMember(this);
 		}
-    },
+
+		function _getMember(thisGroup) {
+			var memberList = thisGroup._memberList;
+			if (memberName in memberList) {
+				return memberList[memberName]('thisObj');
+			} else {
+				for (var key in memberList) {
+					var memberObj = memberList[key]('thisObj');
+					if (memberObj.hasOwnProperty('_memberList')) {
+						return _getMember(memberObj);
+					}
+				}
+			}
+			return null;
+		}
+	},
 
 	override : function (newMember, memberMap) {
 		if (newMember) {
@@ -285,20 +301,20 @@ group.extend({
 			}
 
 			function _overrideMember(thisGroup) {
-                var reset = false;
+				var reset = false;
 				if (thisGroup.hasOwnProperty('_memberList')) {
 					for (var key in thisGroup._memberList) {
 						var memberObj = thisGroup._memberList[key]('thisObj');
 						if (memberObj.name === newMember.name) {
 							thisGroup.join(newMember);
-                            reset = _resetCallToMember(thisGroup);
+							reset = _resetCallToMember(thisGroup);
 						} else if (memberObj.hasOwnProperty('_memberList')) {
-                            if (_overrideMember(memberObj)) {
-                                reset = _resetCallToMember(thisGroup);
-                            }
+							if (_overrideMember(memberObj)) {
+								reset = _resetCallToMember(thisGroup);
+							}
 						}
 					}
-                    
+
 				}
 
 				function _resetCallToMember(thisGrp) {
@@ -308,12 +324,12 @@ group.extend({
 							var toMem = thisGrp._callToMembers[i];
 							thisGrp.setCallToMember(toMem.name, toMem.method);
 						}
-                        return true;
+						return true;
 					}
-                    return false;
+					return false;
 				}
-                
-                return reset;
+
+				return reset;
 			}
 		}
 	},
