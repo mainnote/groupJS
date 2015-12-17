@@ -188,7 +188,7 @@ group.extend({
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower, 
-    git tag -a 0.0.10 -m "Tagging 0.0.10"
+    git tag -a 0.0.11 -m "Tagging 0.0.11"
 
 
 ## Test
