@@ -15,6 +15,7 @@
 }(this, function () {
 
 //for stupid old IE
+var TAG = 'groupjs';
 if (!Object.create) {
 	Object.create = function (o) {
 		if (arguments.length > 1) {
@@ -108,7 +109,7 @@ var obj = {
 				if (window.LOG) {
                     var result = self[cmd](opt);
 					if (!(reservedAttr(cmd))) {
-						LOG(self.name + ' -> ' + cmd, opt, result);
+						LOG(TAG, self.name + ' -> ' + cmd, opt, result);
 					}
                     return result;
 				} else {
@@ -118,7 +119,7 @@ var obj = {
 				if (window.LOG) {
                     var result = self[cmd];
 					if (!(reservedAttr(cmd))) {
-						LOG(self.name + '.' + cmd, '', result);
+						LOG(TAG, self.name + '.' + cmd, '', result);
 					}
                     return result;
 				} else {
@@ -171,7 +172,7 @@ group.extend({
 			memberCmd = this._memberList[memberName];
 			if (window.LOG) {
                 var result = memberCmd(methodName, opt);
-				LOG(this.name + ' => ' + memberName, opt, result);
+				LOG(TAG, this.name + ' => ' + memberName, opt, result);
                 return result;
 			} else {
                 return memberCmd(methodName, opt);
@@ -189,7 +190,7 @@ group.extend({
 							if (memberName === parentNames[j]) {
 								if (window.LOG) {
                                     var result = memberCmd(methodName, opt);
-									LOG(this.name + ' => ' + memberName, opt, result);
+									LOG(TAG, this.name + ' => ' + memberName, opt, result);
 								} else {
                                     memberCmd(methodName, opt); //no return till all members checked
                                 }
