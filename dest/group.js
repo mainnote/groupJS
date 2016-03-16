@@ -101,6 +101,7 @@ var obj = {
 			for (var key in extObj)
 				this[key] = extObj[key];
 		}
+        return this;
 	},
 	command : function () {
 		var self = this;
@@ -165,6 +166,7 @@ group.extend({
 			newMember.group = this;
 			this._memberList[member.name] = newMember.command();
 		}
+        return this;
 	},
 	call : function (memberName, methodName, opt) {
 		var memberCmd;
@@ -234,6 +236,8 @@ group.extend({
 				}
 			}
 		}
+        
+        return this;
 	},
 
 	members : function () {
@@ -354,6 +358,8 @@ group.extend({
 				return reset;
 			}
 		}
+        
+        return this;
 	},
 });
 
