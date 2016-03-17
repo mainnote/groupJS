@@ -163,6 +163,8 @@ group.extend({
 
 * `group.override(newMember[, memberMap])` - override a member in this group. This function will go deep to each level and replace the member with the same name. If memberMap is specified, only the specified path will be search for overridden. 
 
+* Case 1:  A group is instantial, its members will be instantial. At the meantime, if the group setCallToMember. It should set as well.
+
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
 2. [Check example folder](examples/)
@@ -188,7 +190,7 @@ group.extend({
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower, 
-    git tag -a 0.0.14 -m "Tagging 0.0.14"
+    git tag -a 0.0.15 -m "Tagging 0.0.15"
 
 
 ## Test

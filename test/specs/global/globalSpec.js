@@ -287,6 +287,24 @@ describe("Test suite for module in global scope", function () {
 		});
 		childrenGrp.override(childMbr);
 		expect(childrenGrpCmd('smile')).toEqual('haha');
+        
+        //when childrenGrp instantial again, it will point to a new dog member
+        var memberA = Grp.obj.create('memberA');
+        memberA.extend({
+            total: 0,
+            bark: function(){
+                return ++this.total;
+            }
+        });
+        var groupA = Grp.group.create('groupA');
+        groupA.join(memberA);
+		groupA.setCallToMember('memberA');
+        var GA1 = groupA.create('GA1');
+        var GA2 = groupA.create('GA2');
+        var GA3 = groupA.create('GA3');
+        expect(GA1.bark()).toEqual(1);
+        expect(GA2.bark()).toEqual(1);
+        expect(GA3.bark()).toEqual(1);
 	});
 
 	it("test multi level groups", function () {
