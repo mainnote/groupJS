@@ -9,7 +9,7 @@ describe("Test suite for module in global scope", function () {
                 if (typeof(tag) != 'string') {
                     return console.error('TAG is required for LOG!');
                 } else {
-                    tag = tag + '       ';
+                    tag = tag + ' ::: ';
                 }
                 
                 if (msg == undefined) {
@@ -39,7 +39,7 @@ describe("Test suite for module in global scope", function () {
                 if (result == undefined) {
                     result = '';
                 } else {
-                    result = ' === ' + JSON.stringify(result);
+                    result = 'RETURN::' + JSON.stringify(result);
                 }
 
 				return window.console.log(tag, msg + type + result);

@@ -100,7 +100,7 @@ var obj = {
                 if (window.LOG) {
                     var result = self[cmd](opt);
                     if (!(reservedAttr(cmd))) {
-                        LOG(TAG, self.name + ' -> ' + cmd, opt, result);
+                        LOG(TAG, ' Method ' + self.name + '.' + cmd + ' ', opt, result);
                     }
                     return result;
                 } else {
@@ -110,7 +110,7 @@ var obj = {
                 if (window.LOG) {
                     var result = self[cmd];
                     if (!(reservedAttr(cmd))) {
-                        LOG(TAG, self.name + '.' + cmd, '', result);
+                        LOG(TAG, ' Attribute ' + self.name + '.' + cmd + ' ', '', result);
                     }
                     return result;
                 } else {
@@ -167,7 +167,7 @@ group.extend({
             memberCmd = this._memberList[memberName];
             if (window.LOG) {
                 var result = memberCmd(methodName, opt);
-                LOG(TAG, this.name + ' => ' + memberName, opt, result);
+                LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + ' ] ', opt, result);
                 return result;
             } else {
                 return memberCmd(methodName, opt);
@@ -185,7 +185,7 @@ group.extend({
                             if (memberName === parentNames[j]) {
                                 if (window.LOG) {
                                     var result = memberCmd(methodName, opt);
-                                    LOG(TAG, this.name + ' => ' + memberName, opt, result);
+                                    LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + ' ] ', opt, result);
                                 } else {
                                     memberCmd(methodName, opt); //no return till all members checked
                                 }
