@@ -39,7 +39,7 @@ describe("Test suite for module in global scope", function () {
                 if (result == undefined) {
                     result = '';
                 } else {
-                    result = 'RETURN::' + JSON.stringify(result);
+                    result = ' RETURN::' + JSON.stringify(result);
                 }
 
 				return window.console.log(tag, msg + type + result);

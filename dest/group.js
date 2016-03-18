@@ -178,16 +178,17 @@ group.extend({
         return this;
     },
     call: function (memberName, methodName, opt) {
-        var memberCmd;
+        //call member in this group
         if (memberName in this._memberList) {
-            memberCmd = this._memberList[memberName];
+            var memberCmd = this._memberList[memberName];
             if (window.LOG) {
                 var result = memberCmd(methodName, opt);
-                LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + ' ] ', opt, result);
+                LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
                 return result;
             } else {
                 return memberCmd(methodName, opt);
             }
+        //deep call sub group's member
         } else {
             var prototypeMemberList = this._memberList;
             for (var key in prototypeMemberList) {
@@ -201,7 +202,7 @@ group.extend({
                             if (memberName === parentNames[j]) {
                                 if (window.LOG) {
                                     var result = memberCmd(methodName, opt);
-                                    LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + ' ] ', opt, result);
+                                    LOG(TAG, ' SubGroup ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
                                 } else {
                                     memberCmd(methodName, opt); //no return till all members checked
                                 }
