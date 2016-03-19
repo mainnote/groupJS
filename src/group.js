@@ -50,10 +50,15 @@ function reservedAttr(attribute) {
 
 function _resetCallToMember(thisGrp) {
     if ('_callToMembers' in thisGrp) { //reset setCallToMembers and level up
-        var len = thisGrp._callToMembers.length;
-        for (var i = 0; i < len; i++) {
-            var toMem = thisGrp._callToMembers[i];
-            thisGrp.setCallToMember(toMem.name, toMem.method);
+        //clone first since it will reset later
+        var tmp_callToMembers = [];
+        for (var i = 0, l = thisGrp._callToMembers.length; i < l; i++) {
+          tmp_callToMembers[i] = thisGrp._callToMembers[i];
+        }
+        //apply
+        for (var i = 0, l = tmp_callToMembers.length; i < l; i++) {
+            var toMem = tmp_callToMembers[i];
+            thisGrp.setCallToMember(toMem.memberName, toMem.methodName);
         }
         return true;
     }
@@ -130,7 +135,7 @@ group.extend({
         var newObj = obj.create.apply(this, arguments);
         //all members should recreated within new group
         newObj._buildMemberList();
-        
+
         //reset callToMember after group instantial
         _resetCallToMember(newObj);
 
@@ -172,7 +177,7 @@ group.extend({
             } else {
                 return memberCmd(methodName, opt);
             }
-        //deep call sub group's member
+            //deep call sub group's member
         } else {
             var prototypeMemberList = this._memberList;
             for (var key in prototypeMemberList) {
@@ -204,12 +209,24 @@ group.extend({
         var that = this;
         var member = this.call(memberName, 'thisObj');
         if (member) {
-            if (!this._callToMembers)
+            //newly create group object
+            if (!this.hasOwnProperty('_callToMembers'))
                 this._callToMembers = [];
-            this._callToMembers.push({
-                name: memberName,
-                method: methodName
-            });
+
+            function arraySearch(arr, memberName, methodName) {
+                for (var i = 0; i < arr.length; i++)
+                    if (arr[i].memberName == memberName && arr[i].methodName == methodName)
+                        return true;
+                return false;
+            }
+            
+            //ensure no duplicate
+            if (!arraySearch(this._callToMembers, memberName, methodName)) {
+                this._callToMembers.push({
+                    memberName: memberName,
+                    methodName: methodName
+                });
+            }
 
             if (methodName) {
                 _setMethod(methodName, member); //override specific attribute. Even the one might exist.
