@@ -54,6 +54,19 @@ if (typeof Array.isArray === 'undefined') {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 };
+/*Object.prototype.renameProperty = function (oldName, newName) {
+    // Do nothing if the names are the same
+    if (oldName == newName) {
+        return this;
+    }
+    // Check for the old property name to avoid a ReferenceError in strict mode.
+    if (this.hasOwnProperty(oldName)) {
+        this[newName] = this[oldName];
+        delete this[oldName];
+    }
+    return this;
+};*/
+
 //----------------------------
 function reservedAttr(attribute) {
     if ((attribute in obj) || (attribute in group) || attribute === 'parentNames' || attribute === 'group' || attribute === '_memberList' || attribute === 'name' || attribute === '_callToMembers') {
@@ -69,7 +82,7 @@ function _resetCallToMember(thisGrp) {
         //clone first since it will reset later
         var tmp_callToMembers = [];
         for (var i = 0, l = thisGrp._callToMembers.length; i < l; i++) {
-          tmp_callToMembers[i] = thisGrp._callToMembers[i];
+            tmp_callToMembers[i] = thisGrp._callToMembers[i];
         }
         //apply
         for (var i = 0, l = tmp_callToMembers.length; i < l; i++) {
@@ -172,6 +185,18 @@ group.extend({
             }
         }
     },
+    /* I don't see there is any neccesary to rename a member as member name will keep forever.
+        If rename function happen, it will break the nature of group call function for others.
+    renameMember: function (oldMemberName, newMember) {
+        if (this._memberList[oldMemberName]) {
+            if (newMember) {
+                //put newMember into new function
+            } else {
+                //rename it
+                //this._memberList.renameProperty();
+            }
+        }
+    }, */
     join: function () {
         for (var i = 0; i < arguments.length; i++) {
             var member = arguments[i];
@@ -180,6 +205,7 @@ group.extend({
             newMember.group = this;
             this._memberList[member.name] = newMember.command();
         }
+
         return this;
     },
     call: function (memberName, methodName, opt) {
@@ -235,7 +261,7 @@ group.extend({
                         return true;
                 return false;
             }
-            
+
             //ensure no duplicate
             if (!arraySearch(this._callToMembers, memberName, methodName)) {
                 this._callToMembers.push({
@@ -320,7 +346,8 @@ group.extend({
                 for (var key in memberList) {
                     var memberObj = memberList[key]('thisObj');
                     if (memberObj.hasOwnProperty('_memberList')) {
-                        return _getMember(memberObj);
+                        var member = _getMember(memberObj);
+                        if (member) return member;
                     }
                 }
             }
@@ -328,7 +355,7 @@ group.extend({
         }
     },
 
-    override: function (newMember, memberMap) {
+    override: function (newMember, memberMap, newMemberName) {
         if (newMember) {
             if (memberMap && Array.isArray(memberMap)) {
                 //only override the ones in map
