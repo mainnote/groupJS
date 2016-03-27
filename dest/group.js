@@ -16,6 +16,7 @@
 
 //for stupid old IE
 var TAG = 'groupjs';
+if (window) global = window; //for browser 
 if (!Object.create) {
     Object.create = function (o) {
         if (arguments.length > 1) {
@@ -131,7 +132,7 @@ var obj = {
         var self = this;
         return function (cmd, opt) {
             if (typeof self[cmd] === 'function') {
-                if (window.LOG) {
+                if (global.LOG) {
                     var result = self[cmd](opt);
                     if (!(reservedAttr(cmd))) {
                         LOG(TAG, ' Method ' + self.name + '.' + cmd + ' ', opt, result);
@@ -141,7 +142,7 @@ var obj = {
                     return self[cmd](opt);
                 }
             } else {
-                if (window.LOG) {
+                if (global.LOG) {
                     var result = self[cmd];
                     if (!(reservedAttr(cmd))) {
                         LOG(TAG, ' Attribute ' + self.name + '.' + cmd + ' ', '', result);
@@ -212,7 +213,7 @@ group.extend({
         //call member in this group
         if (memberName in this._memberList) {
             var memberCmd = this._memberList[memberName];
-            if (window.LOG) {
+            if (global.LOG) {
                 var result = memberCmd(methodName, opt);
                 LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
                 return result;
@@ -231,7 +232,7 @@ group.extend({
                         var p_len = parentNames.length;
                         for (var j = 0; j < p_len; j++) {
                             if (memberName === parentNames[j]) {
-                                if (window.LOG) {
+                                if (global.LOG) {
                                     var result = memberCmd(methodName, opt);
                                     LOG(TAG, ' SubGroup ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
                                 } else {
