@@ -16,7 +16,7 @@
 
 //for stupid old IE
 var TAG = 'groupjs';
-if (window) global = window; //for browser 
+if (typeof window !== 'undefined' && window) global = window; //for browser 
 if (!Object.create) {
     Object.create = function (o) {
         if (arguments.length > 1) {
