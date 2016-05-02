@@ -98,6 +98,8 @@ function _resetCallToMember(thisGrp) {
 var obj = {
     create: function (name) {
         var newObj = Object.create(this);
+
+        //copy all inherited parents list to new object
         if (this.hasOwnProperty('parentNames')) {
             newObj.parentNames = [];
             var len = this.parentNames.length;
@@ -106,6 +108,7 @@ var obj = {
             }
         }
 
+        //add current parent to the parents list
         if (this.hasOwnProperty('name')) {
             if (!newObj.hasOwnProperty('parentNames'))
                 newObj.parentNames = [];
@@ -131,6 +134,8 @@ var obj = {
     command: function () {
         var self = this;
         return function (cmd, opt) {
+            if (!(cmd in self)) throw 'This object ' + self.name + ' does not have key ' + cmd;
+
             if (typeof self[cmd] === 'function') {
                 if (global.LOG) {
                     var result = self[cmd](opt);
@@ -210,8 +215,10 @@ group.extend({
         return this;
     },
     call: function (memberName, methodName, opt) {
+        var found = false;
         //call member in this group
         if (memberName in this._memberList) {
+            found = true;
             var memberCmd = this._memberList[memberName];
             if (global.LOG) {
                 var result = memberCmd(methodName, opt);
@@ -232,6 +239,7 @@ group.extend({
                         var p_len = parentNames.length;
                         for (var j = 0; j < p_len; j++) {
                             if (memberName === parentNames[j]) {
+                                found = true;
                                 if (global.LOG) {
                                     var result = memberCmd(methodName, opt);
                                     LOG(TAG, ' SubGroup ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
@@ -245,6 +253,7 @@ group.extend({
             }
         }
         //if not found, should we leave error?
+        if (!found)  throw 'This group ' + this.name + ' does not have member ' + memberName;
     },
 
     /* call through to specific member whom play as a major role*/
