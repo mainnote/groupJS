@@ -85,7 +85,7 @@ var obj = {
 
         //copy all inherited parents list to new object
         if (this.hasOwnProperty('parentNames')) {
-            newObj.parentNames = [];
+            newObj.parentNames = []; //init
             var len = this.parentNames.length;
             for (var i = 0; i < len; i++) {
                 newObj.parentNames.push(this.parentNames[i]);
@@ -95,7 +95,7 @@ var obj = {
         //add current parent to the parents list
         if (this.hasOwnProperty('name')) {
             if (!newObj.hasOwnProperty('parentNames'))
-                newObj.parentNames = [];
+                newObj.parentNames = []; //init
             newObj.parentNames.push(this.name);
 
             if (!name) {
@@ -103,7 +103,10 @@ var obj = {
             }
         }
 
-        newObj.name = name;
+        newObj.name = name; //init
+
+        //initialize value in object level
+        if ('initValues' in newObj && typeof newObj.initValues === 'function') newObj.initValues();
 
         return newObj;
     },
@@ -162,10 +165,10 @@ group.extend({
     },
     _buildMemberList: function () {
         if (!this._memberList) { //base group
-            this._memberList = {};
+            this._memberList = {}; //init
         } else if (!this.hasOwnProperty('_memberList')) { //inherited group
             var prototypeMemberList = this._memberList;
-            this._memberList = {}; //in object level memberList
+            this._memberList = {}; //init in object level memberList
             for (var key in prototypeMemberList) {
                 var memberCmd = prototypeMemberList[key];
                 var newMember = memberCmd('create');
@@ -237,7 +240,7 @@ group.extend({
             }
         }
         //if not found, should we leave error?
-        if (!found)  throw 'This group ' + this.name + ' does not have member ' + memberName;
+        if (!found) throw 'This group ' + this.name + ' does not have member ' + memberName;
     },
 
     /* call through to specific member whom play as a major role*/
