@@ -405,10 +405,10 @@ describe("Test suite for module in global scope", function () {
 
     });
 
-    it("test method initValues", function () {
+    it("test method init", function () {
         var parent = Grp.obj.create('parent');
         parent.extend({
-            initValues: function () {
+            init: function () {
                 this.a = [];
                 this.b = {};
             },
@@ -444,7 +444,7 @@ describe("Test suite for module in global scope", function () {
     it("test method super", function () {
         var Parent = Grp.obj.create('Parent');
         Parent.extend({
-            initValues: function () {
+            init: function () {
                 this.a = 'yes';
             }
         });
@@ -453,8 +453,8 @@ describe("Test suite for module in global scope", function () {
         
         var child1 = Parent.create('child1');
         child1.extend({
-            initValues: function(){
-                this.super('initValues');
+            init: function(){
+                this.super('init');
                 this.b = 'no';
             }
         });

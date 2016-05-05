@@ -80,7 +80,8 @@ function _resetCallToMember(thisGrp) {
 }
 
 var obj = {
-    super: function(method, opt){
+    super: function (method, opt) {
+        if (!(this._super && method in this._super)) throw 'This object\'s parent' + this._super.name + ' does not have method ' + method;
         this._super[method].call(this, opt);
     },
     create: function (name) {
@@ -110,7 +111,7 @@ var obj = {
         newObj._super = this;
 
         //initialize value in object level
-        if ('initValues' in newObj && typeof newObj.initValues === 'function') newObj.initValues();
+        if ('init' in newObj && typeof newObj.init === 'function') newObj.init();
 
         return newObj;
     },
