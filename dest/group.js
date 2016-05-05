@@ -96,6 +96,9 @@ function _resetCallToMember(thisGrp) {
 }
 
 var obj = {
+    super: function(method, opt){
+        this._super[method].call(this, opt);
+    },
     create: function (name) {
         var newObj = Object.create(this);
 
@@ -120,6 +123,7 @@ var obj = {
         }
 
         newObj.name = name; //init
+        newObj._super = this;
 
         //initialize value in object level
         if ('initValues' in newObj && typeof newObj.initValues === 'function') newObj.initValues();

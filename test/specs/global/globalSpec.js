@@ -439,4 +439,28 @@ describe("Test suite for module in global scope", function () {
         expect(child1Cmd('getB')['y']).toBeUndefined();
         expect(child2Cmd('getB')['x']).toBeUndefined();
     });
+    
+    
+    it("test method super", function () {
+        var Parent = Grp.obj.create('Parent');
+        Parent.extend({
+            initValues: function () {
+                this.a = 'yes';
+            }
+        });
+        
+        var parentCmd = Parent.create('parentCmd').command();
+        
+        var child1 = Parent.create('child1');
+        child1.extend({
+            initValues: function(){
+                this.super('initValues');
+                this.b = 'no';
+            }
+        });
+        
+        var child1Cmd = child1.command();
+
+        expect(child1Cmd('a')).toEqual(parentCmd('a'));
+    }); //it
 });
