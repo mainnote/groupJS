@@ -430,37 +430,135 @@ describe("Test suite for module in global scope", function () {
         var child1Cmd = parent.create('child1').command();
         var child2Cmd = parent.create('child2').command();
 
-        child1Cmd('setA', {a:1});
-        child2Cmd('setA', {a:2});
+        child1Cmd('setA', {
+            a: 1
+        });
+        child2Cmd('setA', {
+            a: 2
+        });
         expect(child1Cmd('getA')[0] + 1).toEqual(child2Cmd('getA')[0]);
-        
-        child1Cmd('setB', {key: 'x', value: 99});
-        child2Cmd('setB', {key: 'y', value: 99});
+
+        child1Cmd('setB', {
+            key: 'x',
+            value: 99
+        });
+        child2Cmd('setB', {
+            key: 'y',
+            value: 99
+        });
         expect(child1Cmd('getB')['y']).toBeUndefined();
         expect(child2Cmd('getB')['x']).toBeUndefined();
     });
-    
-    
+
+
     it("test method super", function () {
         var Parent = Grp.obj.create('Parent');
+        //console.log('Parent created');
         Parent.extend({
             init: function () {
+                //console.log('Parent.init for ' + this.name);
                 this.a = 'yes';
             }
         });
-        
+        //console.log('Parent extend');
+
         var parentCmd = Parent.create('parentCmd').command();
-        
+        //console.log('parentCmd created');
+
         var child1 = Parent.create('child1');
+        //console.log('child1 created');
         child1.extend({
-            init: function(){
-                this.super('init');
+            init: function () {
+                //console.log('child1.init for ' + this.name);
+                Parent.init.call(this);
                 this.b = 'no';
             }
         });
-        
+        //console.log('child1 extend');
+
         var child1Cmd = child1.command();
 
         expect(child1Cmd('a')).toEqual(parentCmd('a'));
+
+        var grandChild1 = child1.create('grandChild1');
+        //console.log('grandChild1 created');
+        grandChild1.extend({
+            init: function () {
+                //console.log('grandChild1.init for ' + this.name);
+                child1.init.call(this);
+                this.c = 'cool';
+            }
+        });
+        //console.log('grandChild1 extend');
+        var grandChild1Cmd = grandChild1.command();
+        expect(grandChild1Cmd('a')).toEqual(parentCmd('a'));
+
+    }); //it
+
+
+
+    it("test method upCall", function () {
+        var m1 = Grp.obj.create('m1');
+        m1.extend({
+            findM5: function (opt) {
+                return this.group.upCall('m5', 'showMe', {
+                    value: 1
+                });
+            }
+        });
+        var m2 = Grp.obj.create('m2');
+        var gA = Grp.group.create('gA');
+        gA.join(m1, m2);
+
+        var m3 = Grp.obj.create('m3');
+        var m4 = Grp.obj.create('m4');
+        var gB = Grp.group.create('gB');
+        gB.join(m3, m4, gA);
+
+        var m5 = Grp.obj.create('m5');
+        m5.extend({
+            showMe: function (opt) {
+                return opt.value + 10;
+            }
+        });
+        var m6 = Grp.obj.create('m6');
+        var gC = Grp.group.create('gC');
+        gC.extend({
+            callM1: function (opt) {
+                return this.downCall('m1', 'findM5');
+            }
+        });
+        gC.join(m5, m6, gB);
+
+        expect(gC.callM1()).toEqual(11);
+
+    }); //it
+
+
+
+    it("test method call return last inherited member result", function () {
+        var m1 = Grp.obj.create('m1');
+        var n1 = m1.create('n1');
+        n1.extend({
+            show: function (opt) {
+                return 'n1';
+            },
+            showN1: function (opt) {
+                return 'n1';
+            },
+        });
+        var n2 = m1.create('n2');
+        n2.extend({
+            show: function (opt) {
+                return 'n2';
+            }
+        });
+        var gA = Grp.group.create('gA');
+        gA.join(n1, n2);
+        var ga = gA.create('ga');
+
+        expect(ga.call('m1', 'show')).toEqual('n2');
+        expect(ga.call('m1', 'showN1')).toEqual('n1');
+
     }); //it
 });

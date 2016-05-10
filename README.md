@@ -146,10 +146,20 @@ group.extend({
     var opt = { name: 'grpTest_Name' };
     grpTest('promptAlert', opt);
     ```
-* `group.call()`  - call its own member command
+* `group.call()`  - call its own member command. If inherited, the member will still be called based on parents list. return its result or the last call's result.
 
     * For group level, `this.call(<memberName>, <memberAttribute>, opt)` 
     * For member level, `this.group.call(<memberName>, <memberAttribute>, opt)`
+    
+* `group.upCall()`  - call its own member command or find in upper group's member command.  First hit will be return.!!!
+
+    * For group level, `this.upCall(<memberName>, <memberAttribute>, opt)` 
+    * For member level, `this.group.upCall(<memberName>, <memberAttribute>, opt)`
+    
+* `group.downCall()`  - call its own member command or find in sub group's member command. First hit will be return.!!!
+
+    * For group level, `this.downCall(<memberName>, <memberAttribute>, opt)` 
+    * For member level, `this.group.downCall(<memberName>, <memberAttribute>, opt)`
 
 * `group.group` - for member, it refers to its group; for group, refers to its parent group.  
 
@@ -190,7 +200,7 @@ group.extend({
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower, 
-    git tag -a 0.0.24 -m "Tagging 0.0.24"
+    git tag -a 0.0.25 -m "Tagging 0.0.25"
 
 
 ## Test

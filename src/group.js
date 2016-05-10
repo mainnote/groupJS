@@ -80,10 +80,6 @@ function _resetCallToMember(thisGrp) {
 }
 
 var obj = {
-    super: function (method, opt) {
-        if (!(this._super && method in this._super)) throw 'This object\'s parent' + this._super.name + ' does not have method ' + method;
-        this._super[method].call(this, opt);
-    },
     create: function (name) {
         var newObj = Object.create(this);
 
@@ -108,9 +104,6 @@ var obj = {
         }
 
         newObj.name = name; //init
-        newObj._super = this;
-
-        //initialize value in object level
         if ('init' in newObj && typeof newObj.init === 'function') newObj.init();
 
         return newObj;
@@ -118,8 +111,10 @@ var obj = {
     extend: function () {
         for (var i = 0; i < arguments.length; i++) {
             var extObj = arguments[i];
-            for (var key in extObj)
+            for (var key in extObj) {
                 this[key] = extObj[key];
+                if (key === 'init' && typeof this.init === 'function') this.init();
+            }
         }
         return this;
     },
@@ -219,33 +214,86 @@ group.extend({
             } else {
                 return memberCmd(methodName, opt);
             }
-            //deep call sub group's member
+         //check all members if anyone parent matched the memberName (inherited member)
         } else {
+            var result;
             var prototypeMemberList = this._memberList;
             for (var key in prototypeMemberList) {
                 var memberCmd = prototypeMemberList[key];
                 if (typeof memberCmd === 'function') {
                     var member = prototypeMemberList[key]('thisObj');
-                    if (member.hasOwnProperty('parentNames')) {
+                    if (member.hasOwnProperty('parentNames') && methodName in member && typeof member[methodName] === 'function') {
                         var parentNames = member.parentNames;
                         var p_len = parentNames.length;
                         for (var j = 0; j < p_len; j++) {
                             if (memberName === parentNames[j]) {
                                 found = true;
+                                var result = memberCmd(methodName, opt);
                                 if (global.LOG) {
-                                    var result = memberCmd(methodName, opt);
                                     LOG(TAG, ' SubGroup ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
-                                } else {
-                                    memberCmd(methodName, opt); //no return till all members checked
                                 }
                             }
                         }
+                        
                     }
                 }
             }
+            if (found) return result; //last result
         }
         //if not found, should we leave error?
         if (!found) throw 'This group ' + this.name + ' does not have member ' + memberName;
+    },
+
+    //go up level group to find member and execute its method
+    upCall: function (memberName, methodName, opt) {
+        var result = this._upCall(memberName, methodName, opt);
+        if (typeof result === 'string' && result === '__NOTFOUND__') {
+            throw 'The upper groups from ' + this.name + ' does not have member ' + memberName;
+        } else {
+            return result;
+        }
+    },
+    _upCall: function (memberName, methodName, opt) {
+        if (memberName in this._memberList) { //check current group members
+            return this.call(memberName, methodName, opt);
+        } else {
+            if (this.group) {
+                return this.group.upCall(memberName, methodName, opt);
+            } else {
+                return '__NOTFOUND__';
+            }
+        }
+
+    },
+
+
+    //go up level group to find member and execute its method
+    downCall: function (memberName, methodName, opt) {
+        var result = this._downCall(memberName, methodName, opt);
+        if (typeof result === 'string' && result === '__NOTFOUND__') {
+            throw 'The downward groups from ' + this.name + ' does not have member ' + memberName;
+        } else {
+            return result;
+        }
+    },
+    _downCall: function (memberName, methodName, opt) {
+        if (memberName in this._memberList) { //check current group members
+            return this.call(memberName, methodName, opt);
+        } else {
+            var prototypeMemberList = this._memberList;
+            //loop members to find group
+            for (var key in prototypeMemberList) {
+                var memberCmd = prototypeMemberList[key];
+                if (typeof memberCmd === 'function') {
+                    var member = prototypeMemberList[key]('thisObj');
+                    if (member.hasOwnProperty('_memberList')) { //group
+                        return member._downCall(memberName, methodName, opt); //first hit
+                    }
+                }
+            }
+            return '__NOTFOUND__';
+        }
+
     },
 
     /* call through to specific member whom play as a major role*/
