@@ -55,6 +55,16 @@ if (typeof Array.isArray === 'undefined') {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 };
+
+function contains(a, obj) {
+    var i = a.length;
+    while (i--) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
 /*Object.prototype.renameProperty = function (oldName, newName) {
     // Do nothing if the names are the same
     if (oldName == newName) {
@@ -69,15 +79,6 @@ if (typeof Array.isArray === 'undefined') {
 };*/
 
 //----------------------------
-function reservedAttr(attribute) {
-    if ((attribute in obj) || (attribute in group) || attribute === 'parentNames' || attribute === 'group' || attribute === '_memberList' || attribute === 'name' || attribute === '_callToMembers' || attribute === 'opt' || attribute === 'defaultOpt') {
-        return true;
-    } else {
-        return false;
-    }
-};
-
-
 function _resetCallToMember(thisGrp) {
     if ('_callToMembers' in thisGrp) { //reset setCallToMembers and level up
         //clone first since it will reset later
@@ -142,7 +143,7 @@ var obj = {
             if (typeof self[cmd] === 'function') {
                 if (global.LOG) {
                     var result = self[cmd](opt);
-                    if (!(reservedAttr(cmd))) {
+                    if (!(self.isReservedAttr(cmd))) {
                         LOG(TAG, ' Method ' + self.name + '.' + cmd + ' ', opt, result);
                     }
                     return result;
@@ -152,7 +153,7 @@ var obj = {
             } else {
                 if (global.LOG) {
                     var result = self[cmd];
-                    if (!(reservedAttr(cmd))) {
+                    if (!(self.isReservedAttr(cmd))) {
                         LOG(TAG, ' Attribute ' + self.name + '.' + cmd + ' ', '', result);
                     }
                     return result;
@@ -164,6 +165,13 @@ var obj = {
     },
     thisObj: function () {
         return this;
+    },
+    isReservedAttr: function (attribute) {
+        if ((attribute in obj) || (attribute in group) || contains(['parentNames', 'group', '_memberList', 'name', '_callToMembers'], attribute) || (this.reservedAttr && Array.isArray(this.reservedAttr) && contains(this.reservedAttr, attribute))) {
+            return true;
+        } else {
+            return false;
+        }
     },
 };
 
@@ -230,7 +238,7 @@ group.extend({
             } else {
                 return memberCmd(methodName, opt);
             }
-         //check all members if anyone parent matched the memberName (inherited member)
+            //check all members if anyone parent matched the memberName (inherited member)
         } else {
             var result;
             var prototypeMemberList = this._memberList;
@@ -250,7 +258,7 @@ group.extend({
                                 }
                             }
                         }
-                        
+
                     }
                 }
             }
@@ -345,7 +353,7 @@ group.extend({
             }
 
             function _setMethod(attribute, memberObj) {
-                if (!reservedAttr(attribute)) { //skip those attributes exist in group!!!
+                if (!that.isReservedAttr(attribute)) { //skip those attributes exist in group!!!
                     if (typeof memberObj[attribute] === 'function' && !memberObj[attribute].binded) {
                         that[attribute] = memberObj[attribute].bind(memberObj);
                         that[attribute].binded = true;
