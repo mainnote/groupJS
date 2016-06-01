@@ -54,7 +54,7 @@ if (typeof Array.isArray === 'undefined') {
 
 //----------------------------
 function reservedAttr(attribute) {
-    if ((attribute in obj) || (attribute in group) || attribute === 'parentNames' || attribute === 'group' || attribute === '_memberList' || attribute === 'name' || attribute === '_callToMembers') {
+    if ((attribute in obj) || (attribute in group) || attribute === 'parentNames' || attribute === 'group' || attribute === '_memberList' || attribute === 'name' || attribute === '_callToMembers' || attribute === 'opt' || attribute === 'defaultOpt') {
         return true;
     } else {
         return false;
