@@ -58,8 +58,8 @@ formDom.extend({
         var input = document.createElement('input');
         div_container.appendChild(input);
         div_container.appendChild(button_dom);
-        
-        
+
+
         var body = document.getElementsByTagName('body')[0];
         body.appendChild(div_container);
     },
@@ -72,16 +72,16 @@ formEvent.extend({
         if (!errorElem) {
                 errorElem = document.createElement('div');
                 errorElem.className = 'error';
-                opt.container.insertBefore(errorElem, opt.container.childNodes[0]);  
-                
+                opt.container.insertBefore(errorElem, opt.container.childNodes[0]);
+
         }
-        
+
         if (this.group.call('formValidation', 'validation', opt)) {
             errorElem.innerHTML = '';
             var div_comments = document.createElement('div');
             var textnode = document.createTextNode(opt.inputValue);
             div_comments.appendChild(textnode);
-            
+
             opt.container.appendChild(div_comments);
         } else {
             errorElem.innerHTML = 'Wrong Input!';
@@ -128,17 +128,17 @@ form.join(formDom, formEvent, formValidation, formButton); //sub-group
 //-----------------
 //instantiates
 //-----------------
-var newBtnCmd = button.create('newBtnCmd').command();
-newBtnCmd('render');
+var newBtn = button.create('newBtn');
+newBtn.render();
 
-var newFormCmd = form.create('newFormCmd').command();
+var newForm = form.create('newForm');
 var opt1 = { id: 'firstForm' };
-newFormCmd('render', opt1);
+newForm.render(opt1);
 
-var newFormCmd2 = newFormCmd('thisObj').create('newFormCmd2').command();
+var newForm2 = newForm.create('newForm2');
 var opt2 = { id: 'secondForm' };
-newFormCmd2('render', opt2);
+newForm2.render(opt2);
 
-var newFormCmd3 = form.create('newFormCmd3').command();
+var newForm3 = form.create('newForm3');
 var opt3 = { id: 'thirdForm' };
-newFormCmd3('render', opt3);
+newForm3.render(opt3);

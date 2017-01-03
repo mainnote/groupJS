@@ -1,8 +1,7 @@
 //for stupid old IE
-var TAG = 'groupjs';
-if (typeof window !== 'undefined' && window) global = window; //for browser 
+if (typeof window !== 'undefined' && window) global = window; //for browser
 if (!Object.create) {
-    Object.create = function (o) {
+    Object.create = function(o) {
         if (arguments.length > 1) {
             throw new Error('Object.create implementation only accepts the first parameter.');
         }
@@ -13,7 +12,7 @@ if (!Object.create) {
     };
 }
 if (!Function.prototype.bind) {
-    Function.prototype.bind = function (oThis) {
+    Function.prototype.bind = function(oThis) {
         if (typeof this !== 'function') {
             // closest thing possible to the ECMAScript 5
             // internal IsCallable function
@@ -22,8 +21,8 @@ if (!Function.prototype.bind) {
 
         var aArgs = Array.prototype.slice.call(arguments, 1),
             fToBind = this,
-            fNOP = function () {},
-            fBound = function () {
+            fNOP = function() {},
+            fBound = function() {
                 return fToBind.apply(this instanceof fNOP && oThis ? this : oThis,
                     aArgs.concat(Array.prototype.slice.call(arguments)));
             };
@@ -35,7 +34,7 @@ if (!Function.prototype.bind) {
     };
 }
 if (typeof Array.isArray === 'undefined') {
-    Array.isArray = function (obj) {
+    Array.isArray = function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 };
@@ -49,20 +48,69 @@ function contains(a, obj) {
     }
     return false;
 }
-/*Object.prototype.renameProperty = function (oldName, newName) {
-    // Do nothing if the names are the same
-    if (oldName == newName) {
-        return this;
-    }
-    // Check for the old property name to avoid a ReferenceError in strict mode.
-    if (this.hasOwnProperty(oldName)) {
-        this[newName] = this[oldName];
-        delete this[oldName];
-    }
-    return this;
-};*/
 
-//----------------------------
+//---------------------------
+// Define base obj
+//---------------------------
+var obj = {
+    create: function(_id) {
+        var newObj = Object.create(this);
+
+        //copy all inherited parents list to new object
+        if (this.hasOwnProperty('_parentIDs')) {
+            newObj._parentIDs = []; //init
+            var len = this._parentIDs.length;
+            for (var i = 0; i < len; i++) {
+                newObj._parentIDs.push(this._parentIDs[i]);
+            }
+        }
+
+        //add current parent to the parents list
+        if (this.hasOwnProperty('_id')) {
+            if (!newObj.hasOwnProperty('_parentIDs'))
+                newObj._parentIDs = []; //init array for parent list
+            newObj._parentIDs.push(this._id);
+
+            if (!_id) {
+                _id = this._id; //name from original _id during instance
+            }
+        }
+
+        newObj._id = _id; //init
+
+        //calling init() method
+        if ('init' in newObj && typeof newObj.init === 'function') newObj.init();
+
+        return newObj;
+    },
+
+    //extend this object methods and attributes
+    //e.g. OBJ.extend({}, {}, {}......)
+    //
+    extend: function() {
+        for (var i = 0; i < arguments.length; i++) {
+            var extObj = arguments[i];
+            for (var key in extObj) {
+                this[key] = extObj[key];
+
+                //perform init() for new object
+                if (key === 'init' && typeof this.init === 'function') this.init();
+            }
+        }
+        return this;
+    },
+
+    _isReservedAttr: function(attribute) {
+        if ((attribute in obj) || (attribute in group) || contains(['_parentIDs', 'obj', 'group', '_memberList', '_id', '_callToMembers'], attribute) || (this.reservedAttr && Array.isArray(this.reservedAttr) && contains(this.reservedAttr, attribute))) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+};
+
+// a handy function to wire up one or more of member to its group
+
 function _resetCallToMember(thisGrp) {
     if ('_callToMembers' in thisGrp) { //reset setCallToMembers and level up
         //clone first since it will reset later
@@ -73,257 +121,171 @@ function _resetCallToMember(thisGrp) {
         //apply
         for (var i = 0, l = tmp_callToMembers.length; i < l; i++) {
             var toMem = tmp_callToMembers[i];
-            thisGrp.setCallToMember(toMem.memberName, toMem.methodName);
+            thisGrp.setCallToMember(toMem.memberID, toMem.methodName);
         }
         return true;
     }
     return false;
 }
+var __NOTFOUND__ = '__NOTFOUND__';
 
-var obj = {
-    create: function (name) {
-        var newObj = Object.create(this);
-
-        //copy all inherited parents list to new object
-        if (this.hasOwnProperty('parentNames')) {
-            newObj.parentNames = []; //init
-            var len = this.parentNames.length;
-            for (var i = 0; i < len; i++) {
-                newObj.parentNames.push(this.parentNames[i]);
-            }
-        }
-
-        //add current parent to the parents list
-        if (this.hasOwnProperty('name')) {
-            if (!newObj.hasOwnProperty('parentNames'))
-                newObj.parentNames = []; //init
-            newObj.parentNames.push(this.name);
-
-            if (!name) {
-                name = this.name; //name from originate during instance
-            }
-        }
-
-        newObj.name = name; //init
-        if ('init' in newObj && typeof newObj.init === 'function') newObj.init();
-
-        return newObj;
-    },
-    extend: function () {
-        for (var i = 0; i < arguments.length; i++) {
-            var extObj = arguments[i];
-            for (var key in extObj) {
-                this[key] = extObj[key];
-                if (key === 'init' && typeof this.init === 'function') this.init();
-            }
-        }
-        return this;
-    },
-    command: function () {
-        var self = this;
-        return function (cmd, opt) {
-            if (!(cmd in self)) throw 'This object ' + self.name + ' does not have key ' + cmd;
-
-            if (typeof self[cmd] === 'function') {
-                if (global.LOG) {
-                    var result = self[cmd](opt);
-                    if (!(self.isReservedAttr(cmd))) {
-                        LOG(TAG, ' Method ' + self.name + '.' + cmd + ' ', opt, result);
-                    }
-                    return result;
-                } else {
-                    return self[cmd](opt);
-                }
-            } else {
-                if (global.LOG) {
-                    var result = self[cmd];
-                    if (!(self.isReservedAttr(cmd))) {
-                        LOG(TAG, ' Attribute ' + self.name + '.' + cmd + ' ', '', result);
-                    }
-                    return result;
-                } else {
-                    return self[cmd]; //value
-                }
-            }
-        };
-    },
-    thisObj: function () {
-        return this;
-    },
-    isReservedAttr: function (attribute) {
-        if ((attribute in obj) || (attribute in group) || contains(['parentNames', 'group', '_memberList', 'name', '_callToMembers'], attribute) || (this.reservedAttr && Array.isArray(this.reservedAttr) && contains(this.reservedAttr, attribute))) {
-            return true;
-        } else {
-            return false;
-        }
-    },
-};
-
+//---------------------------
+// Define base group
+//---------------------------
 var group = obj.create('group');
 group.extend({
-    create: function (name) {
-        var newObj = obj.create.apply(this, arguments);
-        //all members should recreated within new group
-        newObj._buildMemberList();
+    //create a new group
+    create: function(_groupId) {
+        var newGroup = obj.create.apply(this, arguments);
+        //all group members should recreated within new group
+        if ('_buildMemberList' in newGroup && typeof newGroup._buildMemberList === 'function')
+            newGroup._buildMemberList();
 
         //reset callToMember after group instantial
-        _resetCallToMember(newObj);
+        _resetCallToMember(newGroup);
 
-        return newObj;
+        return newGroup;
     },
-    _buildMemberList: function () {
+    _buildMemberList: function() {
         if (!this._memberList) { //base group
-            this._memberList = {}; //init
+            this._memberList = {}; //init member list for this group
         } else if (!this.hasOwnProperty('_memberList')) { //inherited group
-            var prototypeMemberList = this._memberList;
+            var parentMemberList = this._memberList;
             this._memberList = {}; //init in object level memberList
-            for (var key in prototypeMemberList) {
-                var memberCmd = prototypeMemberList[key];
-                var newMember = memberCmd('create');
-                newMember.group = this; //member
+            for (var key in parentMemberList) {
+                var member = parentMemberList[key];
+                var newMember = member.create();
+                newMember.group = this; //refer to group
 
-                this._memberList[key] = newMember.command();
+                this._memberList[key] = newMember;
             }
         }
     },
-    /* I don't see there is any neccesary to rename a member as member name will keep forever.
-        If rename function happen, it will break the nature of group call function for others.
-    renameMember: function (oldMemberName, newMember) {
-        if (this._memberList[oldMemberName]) {
-            if (newMember) {
-                //put newMember into new function
-            } else {
-                //rename it
-                //this._memberList.renameProperty();
-            }
-        }
-    }, */
-    join: function () {
+
+    join: function() {
         for (var i = 0; i < arguments.length; i++) {
             var member = arguments[i];
             //add new member in command interface
-            var newMember = member.create(member.name);
+            var newMember = member.create();
             newMember.group = this;
-            this._memberList[member.name] = newMember.command();
+            this._memberList[member._id] = newMember;
         }
 
         return this;
     },
-    call: function (memberName, methodName, opt) {
-        var found = false;
-        //call member in this group
-        if (memberName in this._memberList) {
-            found = true;
-            var memberCmd = this._memberList[memberName];
-            if (global.LOG) {
-                var result = memberCmd(methodName, opt);
-                LOG(TAG, ' Group ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
-                return result;
-            } else {
-                return memberCmd(methodName, opt);
-            }
-            //check all members if anyone parent matched the memberName (inherited member)
-        } else {
-            var result;
-            var prototypeMemberList = this._memberList;
-            for (var key in prototypeMemberList) {
-                var memberCmd = prototypeMemberList[key];
-                if (typeof memberCmd === 'function') {
-                    var member = prototypeMemberList[key]('thisObj');
-                    if (member.hasOwnProperty('parentNames') && methodName in member && typeof member[methodName] === 'function') {
-                        var parentNames = member.parentNames;
-                        var p_len = parentNames.length;
-                        for (var j = 0; j < p_len; j++) {
-                            if (memberName === parentNames[j]) {
-                                found = true;
-                                var result = memberCmd(methodName, opt);
-                                if (global.LOG) {
-                                    LOG(TAG, ' SubGroup ' + this.name + ' [ ' + memberName + '.' + methodName + ' ] ', opt, result);
-                                }
-                            }
-                        }
+    // a convinience way to execute a method for specific member in current group
+    call: function(memberID, methodName) {
+        if (typeof memberID !== 'string')
+            throw 'Group ' + this._id + ' calling ' + memberID + ' Error: member id is not string.';
+        if (typeof methodName === 'undefined')
+            throw 'Group ' + this._id + ' calling ' + memberID + ' Error: Method name is not provided';
 
+        //call member in this group
+        if (memberID in this._memberList) {
+            found = true;
+            var member = this._memberList[memberID];
+
+            if (methodName in member && typeof member[methodName] === 'function') {
+                return member[methodName].apply(member, Array.prototype.slice.call(arguments, 2));
+            } else {
+                throw 'Group ' + this._id + ' calling ' + memberID + ' Error: Method name ' + methodName + ' is not found';
+            }
+            //check all members if anyone parent object id matched the memberID (inherited member)
+        } else {
+            var memberList = this._memberList;
+            for (var key in memberList) {
+                var member = memberList[key];
+                if (member.hasOwnProperty('_parentIDs') && methodName in member && typeof member[methodName] === 'function') {
+                    var _parentIDs = member._parentIDs;
+                    var p_len = _parentIDs.length;
+                    for (var j = 0; j < p_len; j++) {
+                        if (memberID === _parentIDs[j]) {
+                            return member[methodName].apply(member, Array.prototype.slice.call(arguments, 2));
+                        }
                     }
                 }
             }
-            if (found) return result; //last result
         }
         //if not found, should we leave error?
-        if (!found) throw 'This group ' + this.name + ' does not have member ' + memberName;
+        throw 'Group ' + this._id + ' does not contain object member ' + memberID;
     },
 
     //go up level group to find member and execute its method
-    upCall: function (memberName, methodName, opt) {
-        var result = this._upCall(memberName, methodName, opt);
-        if (typeof result === 'string' && result === '__NOTFOUND__') {
-            throw 'The upper groups from ' + this.name + ' does not have member ' + memberName;
+    upCall: function(memberID, methodName) {
+        var result = this._upCall.apply(this, arguments);
+        if (typeof result === 'string' && result === __NOTFOUND__) {
+            throw 'The upper groups from group ' + this._id + ' does not have member ' + memberID + ' with method ' + methodName;
         } else {
             return result;
         }
     },
-    _upCall: function (memberName, methodName, opt) {
-        if (memberName in this._memberList) { //check current group members
-            return this.call(memberName, methodName, opt);
+    _upCall: function(memberID, methodName) {
+        if (memberID in this._memberList) { //check current group members
+            return this.call.apply(this, arguments);
         } else {
-            if (this.group) {
-                return this.group.upCall(memberName, methodName, opt);
+            if (this.group) { //go up one level
+                return this.group._upCall.apply(this.group, arguments);
             } else {
-                return '__NOTFOUND__';
+                return __NOTFOUND__;
             }
         }
 
     },
 
 
-    //go up level group to find member and execute its method
-    downCall: function (memberName, methodName, opt) {
-        var result = this._downCall(memberName, methodName, opt);
-        if (typeof result === 'string' && result === '__NOTFOUND__') {
-            throw 'The downward groups from ' + this.name + ' does not have member ' + memberName;
+    //go down level group to find member and execute its method
+    downCall: function(memberID, methodName) {
+        var result = this._downCall.apply(this, arguments);
+        if (typeof result === 'string' && result === __NOTFOUND__) {
+            throw 'The downward groups from group ' + this._id + ' does not have member ' + memberID + ' with method ' + methodName;
         } else {
             return result;
         }
     },
-    _downCall: function (memberName, methodName, opt) {
-        if (memberName in this._memberList) { //check current group members
-            return this.call(memberName, methodName, opt);
+    _downCall: function(memberID, methodName) {
+        if (memberID in this._memberList) { //check current group members
+            return this.call.apply(this, arguments);
         } else {
-            var prototypeMemberList = this._memberList;
+            var memberList = this._memberList;
             //loop members to find group
-            for (var key in prototypeMemberList) {
-                var memberCmd = prototypeMemberList[key];
-                if (typeof memberCmd === 'function') {
-                    var member = prototypeMemberList[key]('thisObj');
+            for (var key in memberList) {
+                var member = memberList[key];
                     if (member.hasOwnProperty('_memberList')) { //group
-                        return member._downCall(memberName, methodName, opt); //first hit
+                        return member._downCall.apply(member, arguments); //first hit
                     }
-                }
             }
-            return '__NOTFOUND__';
+            return __NOTFOUND__;
         }
 
     },
 
     /* call through to specific member whom play as a major role*/
-    setCallToMember: function (memberName, methodName) {
+    setCallToMember: function(memberID, methodName) {
         var that = this;
-        var member = this.call(memberName, 'thisObj');
+        var member;
+
+        //memberID may be member
+        if (typeof memberID == 'string')
+            member = this.getMember(memberID);
+        else
+            member = memberID;
+
         if (member) {
             //newly create group object
             if (!this.hasOwnProperty('_callToMembers'))
                 this._callToMembers = [];
 
-            function arraySearch(arr, memberName, methodName) {
+            function arraySearch(arr, memberID, methodName) {
                 for (var i = 0; i < arr.length; i++)
-                    if (arr[i].memberName == memberName && arr[i].methodName == methodName)
+                    if (arr[i].memberID == memberID && arr[i].methodName == methodName)
                         return true;
                 return false;
             }
 
             //ensure no duplicate
-            if (!arraySearch(this._callToMembers, memberName, methodName)) {
+            if (!arraySearch(this._callToMembers, memberID, methodName)) {
                 this._callToMembers.push({
-                    memberName: memberName,
+                    memberID: memberID,
                     methodName: methodName
                 });
             }
@@ -337,7 +299,7 @@ group.extend({
             }
 
             function _setMethod(attribute, memberObj) {
-                if (!that.isReservedAttr(attribute)) { //skip those attributes exist in group!!!
+                if (!that._isReservedAttr(attribute)) { //skip those attributes exist in group!!!
                     if (typeof memberObj[attribute] === 'function' && !memberObj[attribute].binded) {
                         that[attribute] = memberObj[attribute].bind(memberObj);
                         that[attribute].binded = true;
@@ -351,26 +313,26 @@ group.extend({
         return this;
     },
 
-    members: function () {
+    members: function() {
         function _getMember(thisGroup) {
             var memberList = thisGroup._memberList;
             var ms = [];
             for (var key in memberList) {
-                var member = {
-                    name: key,
+                var memberKey = {
+                    _id: key,
                 };
-                var memberObj = memberList[key]('thisObj');
+                var memberObj = memberList[key];
                 if (memberObj.hasOwnProperty('_memberList')) {
-                    member['members'] = _getMember(memberObj);
+                    memberKey['members'] = _getMember(memberObj);
                 }
-                ms.push(member);
+                ms.push(memberKey);
             }
             return ms;
         }
         return _getMember(this);
     },
 
-    getMember: function (memberName, memberMap) {
+    getMember: function(memberID, memberMap) {
         if (memberMap && Array.isArray(memberMap)) {
             //find the first one in map
             return _findMemberInMap(memberMap, this);
@@ -381,7 +343,7 @@ group.extend({
                     for (var i = 0; i < len; i++) {
                         //if level down
                         if (map[i].hasOwnProperty('members')) {
-                            var member = _findMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
+                            var member = _findMemberInMap(map[i].members, thisGroup.getMember(map[i]._id));
                             if (member)
                                 return member;
                         } else {
@@ -398,11 +360,11 @@ group.extend({
 
         function _getMember(thisGroup) {
             var memberList = thisGroup._memberList;
-            if (memberName in memberList) {
-                return memberList[memberName]('thisObj');
+            if (memberID in memberList) {
+                return memberList[memberID];
             } else {
                 for (var key in memberList) {
-                    var memberObj = memberList[key]('thisObj');
+                    var memberObj = memberList[key];
                     if (memberObj.hasOwnProperty('_memberList')) {
                         var member = _getMember(memberObj);
                         if (member) return member;
@@ -411,55 +373,6 @@ group.extend({
             }
             return null;
         }
-    },
-
-    override: function (newMember, memberMap, newMemberName) {
-        if (newMember) {
-            if (memberMap && Array.isArray(memberMap)) {
-                //only override the ones in map
-                _overrideMemberInMap(memberMap, this);
-
-                function _overrideMemberInMap(map, thisGroup) {
-                    if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
-                        var len = map.length;
-                        for (var i = 0; i < len; i++) {
-                            //if level down
-                            if (map[i].hasOwnProperty('members')) {
-                                _overrideMemberInMap(map[i].members, thisGroup.call(map[i].name, 'thisObj'));
-                            } else {
-                                _overrideMember(thisGroup);
-                            }
-                        }
-                    }
-                }
-
-            } else {
-                //override all member with the same name
-                _overrideMember(this);
-            }
-
-            function _overrideMember(thisGroup) {
-                var reset = false;
-                if (thisGroup.hasOwnProperty('_memberList')) {
-                    for (var key in thisGroup._memberList) {
-                        var memberObj = thisGroup._memberList[key]('thisObj');
-                        if (memberObj.name === newMember.name) {
-                            thisGroup.join(newMember);
-                            reset = _resetCallToMember(thisGroup);
-                        } else if (memberObj.hasOwnProperty('_memberList')) {
-                            if (_overrideMember(memberObj)) {
-                                reset = _resetCallToMember(thisGroup);
-                            }
-                        }
-                    }
-
-                }
-
-                return reset;
-            }
-        }
-
-        return this;
     },
 });
 

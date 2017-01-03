@@ -4,48 +4,6 @@ describe("Test suite for module in global scope", function () {
     });
 
     it("object inheritance of Animal case", function () {
-        window.LOG1 = function (tag, msg, type, result) {
-            if (window.console) {
-                if (typeof (tag) != 'string') {
-                    return console.error('TAG is required for LOG!');
-                } else {
-                    tag = tag + ' ::: ';
-                }
-
-                if (msg == undefined) {
-                    return;
-                } else if (type == '$') {
-                    return window.console.log(tag, msg);
-                } else if (typeof (msg) != 'string') {
-                    msg = JSON.stringify(msg);
-                }
-
-                if (type) {
-                    if (type == 'info' && window.console.info) {
-                        return window.console.info(tag, msg);
-                    } else if (type == 'error' && window.console.error) {
-                        return window.console.error(tag, msg);
-                    } else if (typeof (type) != 'string') {
-                        if (type == undefined) {
-                            type = '';
-                        } else {
-                            type = '( ' + JSON.stringify(type) + ' )';
-                        }
-                    }
-                } else {
-                    type = '';
-                }
-
-                if (result == undefined) {
-                    result = '';
-                } else {
-                    result = ' RETURN::' + JSON.stringify(result);
-                }
-
-                return window.console.log(tag, msg + type + result);
-            }
-        };
-
         var Animal = Grp.obj.create('Animal');
         Animal.extend({
             speak: function (opt) {
@@ -69,16 +27,15 @@ describe("Test suite for module in global scope", function () {
             message: 'my friend',
             food: 1
         };
-        var ant = Ant.create('ant').command();
-        var ant2 = Ant.create('ant2').command();
+        var ant = Ant.create('ant');
+        var ant2 = Ant.create('ant2');
 
-        expect(ant('speak', opt) === 'I am an ant, my friend').toBe(true);
-        expect(ant('food') === 0).toBe(true);
-        ant('foundFood', opt);
-        expect(ant('food') === 0).toBe(false);
-        expect(ant('food') === Ant.command()('food')).toBe(false);
-        expect(ant('food') === ant2('food')).toBe(false);
-        expect(typeof ant('parentNames') === 'object').toBe(true);
+        expect(ant.speak(opt) === 'I am an ant, my friend').toBe(true);
+        expect(ant.food === 0).toBe(true);
+        ant.foundFood(opt);
+        expect(ant.food === 0).toBe(false);
+        expect(ant.food === Ant.food).toBe(false);
+        expect(ant.food === ant2.food).toBe(false);
     });
 
     it("group object of Bus case", function () {
@@ -91,7 +48,7 @@ describe("Test suite for module in global scope", function () {
                 this.call('Driver', 'stopEngine');
             },
             getEngineFlag: function (opt) {
-                return this.call('Engine', 'flag');
+                return this.call('Engine', 'getFlag');
             },
             inform: function (opt) {
                 this.call('Driver', 'informPassengers', opt);
@@ -117,6 +74,9 @@ describe("Test suite for module in global scope", function () {
             stop: function (opt) {
                 this.flag = false;
             },
+            getFlag: function(){
+              return this.flag;
+            }
         });
 
         var Driver = Grp.obj.create('Driver');
@@ -159,19 +119,23 @@ describe("Test suite for module in global scope", function () {
 
         Bus.join(Engine, Driver, John, Tom);
 
-        var cityBusCmd = Bus.create('cityBus').command();
-        cityBusCmd('run');
-        expect(cityBusCmd('getEngineFlag')).toBe(true);
-        cityBusCmd('stop');
-        expect(cityBusCmd('getEngineFlag')).toBe(false);
-        cityBusCmd('inform', {
+        var cityBus = Bus.create('cityBus');
+        cityBus.run();
+        expect(cityBus.getEngineFlag()).toBe(true);
+        cityBus.stop();
+        expect(cityBus.getEngineFlag()).toBe(false);
+
+        //this is test invalid because we don't want to call all sharing _id to be excuted!!!!!
+        /*
+        cityBus.inform({
             station: 'main street'
         });
-        expect(cityBusCmd('noOfPassenger')).toEqual(1);
-        cityBusCmd('inform', {
+        expect(cityBus.noOfPassenger()).toEqual(1);
+        cityBus.inform({
             station: '100 St.'
         });
-        expect(cityBusCmd('noOfPassenger')).toEqual(0);
+        expect(cityBus.noOfPassenger()).toEqual(0);
+        */
     });
 
     it("sub group of IT Company case", function () {
@@ -238,8 +202,8 @@ describe("Test suite for module in global scope", function () {
         });
         ITCompany.join(DevTeam, TestTeam, CEO);
 
-        var microsoft = ITCompany.create('microsoft').command();
-        expect(microsoft('releaseNewProduct')).toEqual('Edge');
+        var microsoft = ITCompany.create('microsoft');
+        expect(microsoft.releaseNewProduct()).toEqual('Edge');
     });
 
     it("test setCallToMember", function () {
@@ -254,8 +218,8 @@ describe("Test suite for module in global scope", function () {
         childrenGrp.join(child);
         childrenGrp.setCallToMember('child');
 
-        childrenGrpCmd = childrenGrp.create('childrenGrpCmd').command();
-        expect(childrenGrpCmd('play')).toEqual('video game');
+        childrenGrpCmd = childrenGrp.create('childrenGrpCmd');
+        expect(childrenGrpCmd.play()).toEqual('video game');
 
         child.extend({
             smile: function () {
@@ -266,7 +230,7 @@ describe("Test suite for module in global scope", function () {
         //you have to manually reset it since we don't know what group it had been join.
         //another option is to use override child with new child.
         childrenGrp.setCallToMember('child', 'smile');
-        expect(childrenGrpCmd('smile')).toEqual('smiling');
+        expect(childrenGrpCmd.smile()).toEqual('smiling');
 
         var dog = Grp.obj.create('dog');
         dog.extend({
@@ -275,18 +239,17 @@ describe("Test suite for module in global scope", function () {
             },
         });
         childrenGrp.join(dog);
-        childrenGrp.setCallToMember('dog');
-        expect(childrenGrpCmd('bark')).toEqual('barking');
+        childrenGrp.setCallToMember(dog);
+        expect(childrenGrpCmd.bark()).toEqual('barking');
 
-        var childMbr = childrenGrp.getMember('child').create();
+        var childMbr = childrenGrp.getMember('child');
 
         childMbr.extend({
             smile: function () {
                 return 'haha';
             },
         });
-        childrenGrp.override(childMbr);
-        expect(childrenGrpCmd('smile')).toEqual('haha');
+        expect(childrenGrpCmd.smile()).toEqual('haha');
 
         //when childrenGrp instantial again, it will point to a new dog member
         var memberA = Grp.obj.create('memberA');

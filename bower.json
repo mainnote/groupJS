@@ -1,6 +1,6 @@
 {
   "name": "groupjs",
-  "version": "0.0.27",
+  "version": "0.1.00",
   "homepage": "https://github.com/mainnote/groupJS",
   "authors": [
     "George Zhang <service@mainnote.com>"
@@ -9,7 +9,7 @@
   "main": "build/group.min.js",
   "moduleType": [
     "amd",
-    "es6",
+    "es5",
     "globals",
     "node",
     "yui"
