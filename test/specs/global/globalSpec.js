@@ -206,168 +206,6 @@ describe("Test suite for module in global scope", function () {
         expect(microsoft.releaseNewProduct()).toEqual('Edge');
     });
 
-    it("test setCallToMember", function () {
-        var child = Grp.obj.create('child');
-        child.extend({
-            toy: 'video game',
-            play: function (opt) {
-                return this.toy;
-            },
-        });
-        var childrenGrp = Grp.group.create('childrenGrp');
-        childrenGrp.join(child);
-        childrenGrp.setCallToMember('child');
-
-        childrenGrpCmd = childrenGrp.create('childrenGrpCmd');
-        expect(childrenGrpCmd.play()).toEqual('video game');
-
-        child.extend({
-            smile: function () {
-                return 'smiling';
-            },
-        });
-
-        //you have to manually reset it since we don't know what group it had been join.
-        //another option is to use override child with new child.
-        childrenGrp.setCallToMember('child', 'smile');
-        expect(childrenGrpCmd.smile()).toEqual('smiling');
-
-        var dog = Grp.obj.create('dog');
-        dog.extend({
-            bark: function () {
-                return 'barking';
-            },
-        });
-        childrenGrp.join(dog);
-        childrenGrp.setCallToMember(dog);
-        expect(childrenGrpCmd.bark()).toEqual('barking');
-
-        var childMbr = childrenGrp.getMember('child');
-
-        childMbr.extend({
-            smile: function () {
-                return 'haha';
-            },
-        });
-        expect(childrenGrpCmd.smile()).toEqual('haha');
-
-        //when childrenGrp instantial again, it will point to a new dog member
-        var memberA = Grp.obj.create('memberA');
-        memberA.extend({
-            total: 0,
-            bark: function () {
-                return ++this.total;
-            }
-        });
-        var groupA = Grp.group.create('groupA');
-        groupA.join(memberA);
-        groupA.setCallToMember('memberA');
-        var GA1 = groupA.create('GA1');
-        var GA2 = groupA.create('GA2');
-        var GA3 = groupA.create('GA3');
-        expect(GA1.bark()).toEqual(1);
-        expect(GA2.bark()).toEqual(1);
-        expect(GA3.bark()).toEqual(1);
-    });
-
-    it("test multi level groups", function () {
-        var a0 = Grp.obj.create('a0');
-        var a1 = Grp.obj.create('a1');
-        var a2 = Grp.obj.create('a2');
-        var g0 = Grp.group.create('g0');
-        g0.join(a0, a1, a2);
-
-        var b0 = Grp.obj.create('b0');
-        var b1 = Grp.obj.create('b1');
-        var b2 = Grp.obj.create('b2');
-        b2.extend({
-            say: function () {
-                return 'I am b2';
-            },
-        });
-        var g1 = Grp.group.create('g1');
-        g1.join(b0, b1, b2, g0);
-        g1.setCallToMember('b2');
-        g1.extend({
-            sayg1: function () {},
-        });
-
-        var b01 = Grp.obj.create('b01');
-        var b11 = Grp.obj.create('b11');
-        var b21 = Grp.obj.create('b21');
-        var g11 = Grp.group.create('g11');
-        g11.join(b01, b11, b21, b2);
-
-        var c0 = Grp.obj.create('c0');
-        var c1 = Grp.obj.create('c1');
-        var c2 = Grp.obj.create('c2');
-        var g2 = Grp.group.create('g2');
-
-        c1.extend({
-            sing: function (opt) {
-                return 'music';
-            }
-        });
-        g2.join(c0, c1, c2, g1, g11);
-        g2.setCallToMember('g1');
-
-        var members = g2.members();
-        expect(members[3].members[3].members[0].name).toEqual('a0');
-
-        var xx = Grp.obj.create('b2');
-        xx.extend({
-            say: function () {
-                return 'hi';
-            },
-        });
-        g2.override(xx);
-        //console.log('members', JSON.stringify(g2.members()));
-        expect(g2.command()('say')).toEqual('hi');
-        expect(g2.say()).toEqual('hi');
-        expect(g2.call('g1', 'thisObj').call('b2', 'thisObj').say()).toEqual('hi');
-        expect(g2.call('g11', 'thisObj').call('b2', 'thisObj').say()).toEqual('hi');
-
-        var map = [{
-                "name": "g1",
-                "members": [{
-                        "name": "g0",
-                        "members": [{
-                                "name": "a0"
-							}
-						]
-					}
-				]
-			},
-		];
-        var yy = Grp.obj.create('a0');
-        yy.extend({
-            yell: function () {
-                return 'yeah!';
-            },
-        });
-        g2.override(yy, map);
-        expect(g2.call('g1', 'thisObj').call('g0', 'thisObj').call('a0', 'thisObj').yell()).toEqual('yeah!');
-
-        var newC1 = g2.getMember('c1').create();
-        newC1.extend({
-            ask: function (opt) {
-                return this.sing();
-            },
-        })
-        g2.override(newC1);
-        expect(g2.call('c1', 'ask')).toEqual('music');
-
-        var newA0 = g2.getMember('a0', map).create();
-        expect(newA0.yell()).toEqual('yeah!');
-        expect(g2.getMember('x99')).toEqual(null);
-        expect(g2.getMember('b2').name).toEqual('b2');
-
-        /*
-        console.log(JSON.stringify(g2.members()));
-        [{"name":"c0"},{"name":"c1"},{"name":"c2"},{"name":"g1","members":[{"name":"b0"},{"name":"b1"},{"name":"b2"},{"name":"g0","members":[{"name":"a0"},{"name":"a1"},{"name":"a2"}]}]},{"name":"g11","members":[{"name":"b01"},{"name":"b11"},{"name":"b21"},{"name":"b2"}]}] */
-
-    });
-
     it("test method init", function () {
         var parent = Grp.obj.create('parent');
         parent.extend({
@@ -390,71 +228,60 @@ describe("Test suite for module in global scope", function () {
             }
         });
 
-        var child1Cmd = parent.create('child1').command();
-        var child2Cmd = parent.create('child2').command();
+        var child1 = parent.create('child1');
+        var child2 = parent.create('child2');
 
-        child1Cmd('setA', {
+        child1.setA({
             a: 1
         });
-        child2Cmd('setA', {
+        child2.setA({
             a: 2
         });
-        expect(child1Cmd('getA')[0] + 1).toEqual(child2Cmd('getA')[0]);
+        expect(child1.getA('')[0] + 1).toEqual(child2.getA()[0]);
 
-        child1Cmd('setB', {
+        child1.setB({
             key: 'x',
             value: 99
         });
-        child2Cmd('setB', {
+        child2.setB({
             key: 'y',
             value: 99
         });
-        expect(child1Cmd('getB')['y']).toBeUndefined();
-        expect(child2Cmd('getB')['x']).toBeUndefined();
+        expect(child1.getB()['y']).toBeUndefined();
+        expect(child2.getB()['x']).toBeUndefined();
     });
 
 
     it("test method super", function () {
         var Parent = Grp.obj.create('Parent');
-        //console.log('Parent created');
         Parent.extend({
             init: function () {
-                //console.log('Parent.init for ' + this.name);
                 this.a = 'yes';
+            },
+            getA: function(){
+              return this.a;
             }
         });
-        //console.log('Parent extend');
 
-        var parentCmd = Parent.create('parentCmd').command();
-        //console.log('parentCmd created');
+        var parentCmd = Parent.create('parentCmd');
 
         var child1 = Parent.create('child1');
-        //console.log('child1 created');
         child1.extend({
             init: function () {
-                //console.log('child1.init for ' + this.name);
                 Parent.init.call(this);
                 this.b = 'no';
             }
         });
-        //console.log('child1 extend');
-
-        var child1Cmd = child1.command();
-
-        expect(child1Cmd('a')).toEqual(parentCmd('a'));
+        expect(child1.getA()).toEqual(parentCmd.getA());
 
         var grandChild1 = child1.create('grandChild1');
-        //console.log('grandChild1 created');
         grandChild1.extend({
             init: function () {
-                //console.log('grandChild1.init for ' + this.name);
                 child1.init.call(this);
                 this.c = 'cool';
             }
         });
-        //console.log('grandChild1 extend');
-        var grandChild1Cmd = grandChild1.command();
-        expect(grandChild1Cmd('a')).toEqual(parentCmd('a'));
+        expect(grandChild1.getA()).toEqual(parentCmd.getA());
 
     }); //it
 
@@ -497,31 +324,32 @@ describe("Test suite for module in global scope", function () {
 
     }); //it
 
-
-
-    it("test method call return last inherited member result", function () {
-        var m1 = Grp.obj.create('m1');
-        var n1 = m1.create('n1');
-        n1.extend({
-            show: function (opt) {
-                return 'n1';
-            },
-            showN1: function (opt) {
-                return 'n1';
+    it("test method override", function(){
+        var a0 = Grp.obj.create('a0');
+        a0.extend({
+            speak: function() {
+                return 'a0';
             },
         });
-        var n2 = m1.create('n2');
-        n2.extend({
-            show: function (opt) {
-                return 'n2';
+
+        var g0 = Grp.group.create('g0');
+        g0.extend({
+            run: function(){
+                return this.call('a0', 'speak');
             }
         });
-        var gA = Grp.group.create('gA');
-        gA.join(n1, n2);
-        var ga = gA.create('ga');
+        g0.join(a0);
 
-        expect(ga.call('m1', 'show')).toEqual('n2');
-        expect(ga.call('m1', 'showN1')).toEqual('n1');
+        expect(g0.run()).toEqual('a0');
 
-    }); //it
+        a01 = Grp.obj.create('a0');
+        a01.extend({
+            speak: function(){
+                return 'a01';
+            },
+        });
+        g0.override(a01);
+        expect(g0.run()).toEqual('a01');
+
+    });
 });

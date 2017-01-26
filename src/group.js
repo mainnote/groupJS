@@ -101,7 +101,7 @@ var obj = {
     },
 
     _isReservedAttr: function(attribute) {
-        if ((attribute in obj) || (attribute in group) || contains(['_parentIDs', 'obj', 'group', '_memberList', '_id', '_callToMembers'], attribute) || (this.reservedAttr && Array.isArray(this.reservedAttr) && contains(this.reservedAttr, attribute))) {
+        if ((attribute in obj) || (attribute in group) || contains(['_parentIDs', 'obj', 'group', '_memberList', '_id'], attribute) || (this.reservedAttr && Array.isArray(this.reservedAttr) && contains(this.reservedAttr, attribute))) {
             return true;
         } else {
             return false;
@@ -109,24 +109,6 @@ var obj = {
     },
 };
 
-// a handy function to wire up one or more of member to its group
-
-function _resetCallToMember(thisGrp) {
-    if ('_callToMembers' in thisGrp) { //reset setCallToMembers and level up
-        //clone first since it will reset later
-        var tmp_callToMembers = [];
-        for (var i = 0, l = thisGrp._callToMembers.length; i < l; i++) {
-            tmp_callToMembers[i] = thisGrp._callToMembers[i];
-        }
-        //apply
-        for (var i = 0, l = tmp_callToMembers.length; i < l; i++) {
-            var toMem = tmp_callToMembers[i];
-            thisGrp.setCallToMember(toMem.memberID, toMem.methodName);
-        }
-        return true;
-    }
-    return false;
-}
 var __NOTFOUND__ = '__NOTFOUND__';
 
 //---------------------------
@@ -140,9 +122,6 @@ group.extend({
         //all group members should recreated within new group
         if ('_buildMemberList' in newGroup && typeof newGroup._buildMemberList === 'function')
             newGroup._buildMemberList();
-
-        //reset callToMember after group instantial
-        _resetCallToMember(newGroup);
 
         return newGroup;
     },
@@ -250,69 +229,14 @@ group.extend({
             //loop members to find group
             for (var key in memberList) {
                 var member = memberList[key];
-                    if (member.hasOwnProperty('_memberList')) { //group
-                        return member._downCall.apply(member, arguments); //first hit
-                    }
+                if (member.hasOwnProperty('_memberList')) { //group
+                    return member._downCall.apply(member, arguments); //first hit
+                }
             }
             return __NOTFOUND__;
         }
 
     },
-
-    /* call through to specific member whom play as a major role*/
-    setCallToMember: function(memberID, methodName) {
-        var that = this;
-        var member;
-
-        //memberID may be member
-        if (typeof memberID == 'string')
-            member = this.getMember(memberID);
-        else
-            member = memberID;
-
-        if (member) {
-            //newly create group object
-            if (!this.hasOwnProperty('_callToMembers'))
-                this._callToMembers = [];
-
-            function arraySearch(arr, memberID, methodName) {
-                for (var i = 0; i < arr.length; i++)
-                    if (arr[i].memberID == memberID && arr[i].methodName == methodName)
-                        return true;
-                return false;
-            }
-
-            //ensure no duplicate
-            if (!arraySearch(this._callToMembers, memberID, methodName)) {
-                this._callToMembers.push({
-                    memberID: memberID,
-                    methodName: methodName
-                });
-            }
-
-            if (methodName) {
-                _setMethod(methodName, member); //override specific attribute. Even the one might exist.
-            } else {
-                for (var key in member) {
-                    _setMethod(key, member);
-                }
-            }
-
-            function _setMethod(attribute, memberObj) {
-                if (!that._isReservedAttr(attribute)) { //skip those attributes exist in group!!!
-                    if (typeof memberObj[attribute] === 'function' && !memberObj[attribute].binded) {
-                        that[attribute] = memberObj[attribute].bind(memberObj);
-                        that[attribute].binded = true;
-                    } else {
-                        that[attribute] = memberObj[attribute];
-                    }
-                }
-            }
-        }
-
-        return this;
-    },
-
     members: function() {
         function _getMember(thisGroup) {
             var memberList = thisGroup._memberList;
@@ -373,6 +297,49 @@ group.extend({
             }
             return null;
         }
+    },
+
+    override: function(newMember, memberMap) {
+        if (newMember) {
+            if (memberMap && Array.isArray(memberMap)) {
+                //only override the ones in map
+                _overrideMemberInMap(memberMap, this);
+
+                function _overrideMemberInMap(map, thisGroup) {
+                    if (Array.isArray(map) && thisGroup && thisGroup.hasOwnProperty('_memberList')) {
+                        var len = map.length;
+                        for (var i = 0; i < len; i++) {
+                            //if level down
+                            if (map[i].hasOwnProperty('members')) {
+                                _overrideMemberInMap(map[i].members, map[i]);
+                            } else {
+                                _overrideMember(thisGroup);
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                //override all member with the same name
+                _overrideMember(this);
+            }
+
+            function _overrideMember(thisGroup) {
+                if (thisGroup.hasOwnProperty('_memberList')) {
+                    for (var key in thisGroup._memberList) {
+                        var memberObj = thisGroup._memberList[key];
+                        if (memberObj._id === newMember._id) {
+                            thisGroup.join(newMember);
+                        } else if (memberObj.hasOwnProperty('_memberList')) {
+                            _overrideMember(memberObj);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return this;
     },
 });
 

@@ -31,13 +31,14 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
     });
     ```
 
-* `obj._parentIDs` - internal array to keep all inherited object's IDs.
-
 * `obj.reservedAttr` - Array of string to reserved attributes or methods names for this module.
+
+* `obj.init()` - initialize local variable
 
 #### Group
 
 * `group.create(<group id>)` - create a new group
+
 * `group.join(<member or sub-Group>[, <member2 or sub-Group2>...])` - join a memeber into this group. If member name exists, the member will be overriden.
 
     ```javascript
@@ -45,7 +46,7 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
     var newObj = Grp.obj.create('newObj');
     newObj.extend({
         newAttribute: function(opt) {
-            alert('this is a new attribute for ' + opt.name||'');
+            alert('this is a new attribute for ' + opt._id||'');
         },
     });
 
@@ -58,10 +59,11 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
         },
     });
 
-    var grpTest = newGrp.create('grpTest').command();
+    var grpTest = newGrp.create('grpTest');
     var opt = { name: 'grpTest_Name' };
-    grpTest('promptAlert', opt);
+    grpTest.promptAlert(opt);
     ```
+
 * `group.call()`  - call its own member command. If inherited, the member will still be called based on parents list. return its result or the last call's result.
 
     * For group level, `this.call(<member or memberID>, <methodName>, opt)`
@@ -79,15 +81,10 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
 
 * `group.group` - for member, it refers to its group; for group, refers to its parent group.  
 
-* `group.setCallToMember(<memberName>, [<methodName>])`  - a convenient way to port all functions/single method of a specific member to group level
-
-    * <methodName> is optional.
-
-* `group.members()` - show a map of this group's members. This is to be used in `group.override(newMember, memberMap)` .
+* `group.members()` - show a map of this group's members.
 
 * `group.getMember(memberName[, memberMap])` - get a member by name.
 
-* Case 1:  A group is instantial, its members will be instantial. At the meantime, if the group setCallToMember. It should set as well.
 
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)
@@ -114,7 +111,7 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
     bower register groupjs git://github.com/mainnote/groupJS.git
 
     Change version in bower,
-    git tag -a 0.1.00 -m "Tagging 0.1.00"
+    git tag -a 0.1.01 -m "Tagging 0.1.01"
 
 
 ## Test

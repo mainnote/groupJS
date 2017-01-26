@@ -70,6 +70,6 @@ module.exports = function(grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['umd', 'uglify']);
-    grunt.registerTask('test', ['jasmine:global', 'jasmine:requirejs']);
+    grunt.registerTask('test', ['jasmine:global']); //,'jasmine:requirejs'
     grunt.registerTask('check', ['jasmine:check']);
 };

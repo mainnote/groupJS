@@ -1,6 +1,6 @@
 {
   "name": "groupjs",
-  "version": "0.0.27",
+  "version": "0.1.01",
   "description": "An inheritance implementation pattern of grouping javascript objects for instances.",
   "main": "build/group.min.js",
   "scripts": {
@@ -22,10 +22,10 @@
   "homepage": "https://github.com/mainnote/groupJS#readme",
   "devDependencies": {
     "grunt": "*",
-    "grunt-contrib-jasmine": "*",
+    "grunt-contrib-jasmine": "^1.1.0",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-watch": "*",
-    "grunt-template-jasmine-requirejs": "*",
+    "grunt-template-jasmine-requirejs": "^0.2.3",
     "grunt-umd": "*"
   }
 }
