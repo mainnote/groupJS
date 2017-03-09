@@ -85,6 +85,8 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
 
 * `group.getMember(memberName[, memberMap])` - get a member by name.
 
+* `group.override(newMember[, memberMap])` - To be overridden the member with the same `_id`. Note: Do not use it
+
 
 ## Examples
 1. [Check the test cases and you might get some idea](test/specs/global/globalSpec.js)

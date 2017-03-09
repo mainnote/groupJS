@@ -107,6 +107,9 @@ var obj = {
             return false;
         }
     },
+    self: function(){
+        return this;
+    }
 };
 
 var __NOTFOUND__ = '__NOTFOUND__';
