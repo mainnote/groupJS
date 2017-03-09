@@ -105,15 +105,21 @@ Group A can be "inherited". E.g. you create group AA with the same function as g
     grunt
 
 ## Release
+    grunt
+    grunt test
+    
+    git add . -A
+    git commit -m ""
+    git push
+
+    Change version in bower,
+    git tag -a 0.1.03 -m "Tagging 0.1.03"
 
     To npm, change version number
     npm publish ./
 
     Register in bower
     bower register groupjs git://github.com/mainnote/groupJS.git
-
-    Change version in bower,
-    git tag -a 0.1.02 -m "Tagging 0.1.02"
 
 
 ## Test

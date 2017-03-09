@@ -1,6 +1,6 @@
 {
   "name": "groupjs",
-  "version": "0.1.02",
+  "version": "0.1.03",
   "homepage": "https://github.com/mainnote/groupJS",
   "authors": [
     "George Zhang <service@mainnote.com>"
@@ -24,5 +24,6 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {}
 }
